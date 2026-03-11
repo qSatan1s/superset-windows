@@ -4,11 +4,13 @@ import { useEffect } from "react";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { HotkeyTooltipContent } from "renderer/components/HotkeyTooltipContent";
 import { useAppHotkey } from "renderer/stores/hotkeys";
+import { useI18n } from "renderer/lib/i18n";
 import { HistoryDropdown } from "./components/HistoryDropdown";
 
 export function NavigationControls() {
 	const router = useRouter();
 	const location = useLocation();
+	const { tt } = useI18n();
 
 	const canGoBack = router.history.canGoBack();
 	const canGoForward = location.state.__TSR_index < router.history.length - 1;
@@ -45,7 +47,7 @@ export function NavigationControls() {
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					<HotkeyTooltipContent label="Go back" hotkeyId="NAVIGATE_BACK" />
+					<HotkeyTooltipContent label={tt("Go back")} hotkeyId="NAVIGATE_BACK" />
 				</TooltipContent>
 			</Tooltip>
 
@@ -62,7 +64,7 @@ export function NavigationControls() {
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
 					<HotkeyTooltipContent
-						label="Go forward"
+						label={tt("Go forward")}
 						hotkeyId="NAVIGATE_FORWARD"
 					/>
 				</TooltipContent>

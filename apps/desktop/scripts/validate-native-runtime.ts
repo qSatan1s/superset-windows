@@ -279,56 +279,11 @@ function collectFiles(rootDir: string): string[] {
 }
 
 function getPlatformLibsqlCandidates(): string[] {
-	const targetArch = process.env.TARGET_ARCH || process.arch;
-	const targetPlatform = process.env.TARGET_PLATFORM || process.platform;
-
-	if (targetPlatform === "darwin") {
-		return [
-			targetArch === "arm64" ? "@libsql/darwin-arm64" : "@libsql/darwin-x64",
-		];
-	}
-
-	if (targetPlatform === "linux") {
-		if (targetArch === "arm64") {
-			return ["@libsql/linux-arm64-gnu", "@libsql/linux-arm64-musl"];
-		}
-		if (targetArch === "arm") {
-			return ["@libsql/linux-arm-gnueabihf", "@libsql/linux-arm-musleabihf"];
-		}
-		return ["@libsql/linux-x64-gnu", "@libsql/linux-x64-musl"];
-	}
-
-	if (targetPlatform === "win32") {
-		return ["@libsql/win32-x64-msvc"];
-	}
-
-	return [];
+	return ["@libsql/win32-x64-msvc"];
 }
 
 function getPlatformAstGrepCandidates(): string[] {
-	const targetArch = process.env.TARGET_ARCH || process.arch;
-	const targetPlatform = process.env.TARGET_PLATFORM || process.platform;
-
-	if (targetPlatform === "darwin") {
-		return [
-			targetArch === "arm64"
-				? "@ast-grep/napi-darwin-arm64"
-				: "@ast-grep/napi-darwin-x64",
-		];
-	}
-
-	if (targetPlatform === "linux") {
-		if (targetArch === "arm64") {
-			return ["@ast-grep/napi-linux-arm64-gnu"];
-		}
-		return ["@ast-grep/napi-linux-x64-gnu", "@ast-grep/napi-linux-x64-musl"];
-	}
-
-	if (targetPlatform === "win32") {
-		return ["@ast-grep/napi-win32-x64-msvc"];
-	}
-
-	return [];
+	return ["@ast-grep/napi-win32-x64-msvc"];
 }
 
 function validateNativeModulesPrepared(): void {
@@ -402,52 +357,13 @@ function validateNativeModulesPrepared(): void {
 }
 
 function getPlatformParcelWatcherCandidates(): string[] {
-	if (process.platform === "darwin") {
-		return [
-			process.arch === "arm64"
-				? "@parcel/watcher-darwin-arm64"
-				: "@parcel/watcher-darwin-x64",
-		];
+	if (process.arch === "arm64") {
+		return ["@parcel/watcher-win32-arm64"];
 	}
-
-	if (process.platform === "linux") {
-		if (process.arch === "arm64") {
-			return [
-				"@parcel/watcher-linux-arm64-glibc",
-				"@parcel/watcher-linux-arm64-musl",
-			];
-		}
-		if (process.arch === "arm") {
-			return [
-				"@parcel/watcher-linux-arm-glibc",
-				"@parcel/watcher-linux-arm-musl",
-			];
-		}
-		return [
-			"@parcel/watcher-linux-x64-glibc",
-			"@parcel/watcher-linux-x64-musl",
-		];
+	if (process.arch === "ia32") {
+		return ["@parcel/watcher-win32-ia32"];
 	}
-
-	if (process.platform === "win32") {
-		if (process.arch === "arm64") {
-			return ["@parcel/watcher-win32-arm64"];
-		}
-		if (process.arch === "ia32") {
-			return ["@parcel/watcher-win32-ia32"];
-		}
-		return ["@parcel/watcher-win32-x64"];
-	}
-
-	if (process.platform === "android") {
-		return ["@parcel/watcher-android-arm64"];
-	}
-
-	if (process.platform === "freebsd") {
-		return ["@parcel/watcher-freebsd-x64"];
-	}
-
-	return [];
+	return ["@parcel/watcher-win32-x64"];
 }
 
 function validateParcelWatcherPrepared(): void {

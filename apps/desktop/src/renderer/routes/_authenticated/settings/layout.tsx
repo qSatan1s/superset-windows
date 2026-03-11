@@ -79,8 +79,6 @@ function getPathFromSection(section: SettingsSection): string {
 }
 
 function SettingsLayout() {
-	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
-	const isMac = platform === undefined || platform === "darwin";
 	const searchQuery = useSettingsSearchQuery();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -115,7 +113,7 @@ function SettingsLayout() {
 			<div
 				className="drag h-8 w-full bg-tertiary"
 				style={{
-					paddingLeft: isMac ? "88px" : "16px",
+					paddingLeft: "16px",
 				}}
 			/>
 

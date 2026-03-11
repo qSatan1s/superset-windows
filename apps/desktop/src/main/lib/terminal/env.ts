@@ -1,6 +1,7 @@
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
+import path from "node:path";
 import defaultShell from "default-shell";
 import { env } from "shared/env.shared";
 import { getShellEnv } from "../agent-setup/shell-wrappers";
@@ -64,6 +65,40 @@ export function normalizeDefaultShell(
 	return null;
 }
 
+/**
+ * On Windows, prefer Git Bash when available for a consistent bash experience
+ * and shell integration (PATH injection, agent wrappers). Falls back to PowerShell.
+ */
+function getWindowsDefaultShell(): string {
+	// User may have SHELL set (e.g. by Git Bash)
+	if (process.env.SHELL) {
+		const s = process.env.SHELL.trim();
+		if (s.toLowerCase().endsWith("bash.exe") && fs.existsSync(s)) {
+			return s;
+		}
+	}
+
+	const programFiles = process.env.ProgramFiles || "C:\\Program Files";
+	const programFilesX86 = process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)";
+	const localAppData = process.env.LOCALAPPDATA;
+
+	const candidates: string[] = [
+		path.join(programFiles, "Git", "bin", "bash.exe"),
+		path.join(programFilesX86, "Git", "bin", "bash.exe"),
+	];
+	if (localAppData) {
+		candidates.unshift(path.join(localAppData, "Programs", "Git", "bin", "bash.exe"));
+	}
+
+	for (const candidate of candidates) {
+		if (fs.existsSync(candidate)) {
+			return candidate;
+		}
+	}
+
+	return process.env.COMSPEC || "powershell.exe";
+}
+
 export function getDefaultShell(): string {
 	const resolvedDefaultShell = normalizeDefaultShell(defaultShell);
 	if (resolvedDefaultShell) {
@@ -73,7 +108,7 @@ export function getDefaultShell(): string {
 	const platform = os.platform();
 
 	if (platform === "win32") {
-		return process.env.COMSPEC || "powershell.exe";
+		return getWindowsDefaultShell();
 	}
 
 	if (process.env.SHELL) {
@@ -442,15 +477,7 @@ export function buildTerminalEnv(params: {
 
 	delete terminalEnv.GOOGLE_API_KEY;
 
-	// Electron child processes can't access macOS Keychain for TLS cert verification,
-	// causing "x509: OSStatus -26276" in Go binaries like `gh`. File-based fallback.
-	if (
-		os.platform() === "darwin" &&
-		!terminalEnv.SSL_CERT_FILE &&
-		fs.existsSync(MACOS_SYSTEM_CERT_FILE)
-	) {
-		terminalEnv.SSL_CERT_FILE = MACOS_SYSTEM_CERT_FILE;
-	}
+
 
 	return terminalEnv;
 }

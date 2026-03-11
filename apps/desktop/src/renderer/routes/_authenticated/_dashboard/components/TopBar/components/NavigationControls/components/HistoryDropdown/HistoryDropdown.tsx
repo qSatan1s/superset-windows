@@ -18,6 +18,7 @@ import {
 	type StatusType,
 } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/components/shared/StatusIcon";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useI18n } from "renderer/lib/i18n";
 import {
 	type RecentlyViewedEntry,
 	useRecentlyViewed,
@@ -40,6 +41,7 @@ function WorkspaceRow({
 	onSelect: () => void;
 }) {
 	const ws = workspaceData.find((w) => w.id === entry.entityId);
+	const { tt } = useI18n();
 
 	return (
 		<DropdownMenuItem
@@ -49,7 +51,7 @@ function WorkspaceRow({
 			{ws ? (
 				<>
 					<span className="text-muted-foreground text-xs shrink-0 w-20 text-left line-clamp-1">
-						Workspace
+						{tt("Workspace")}
 					</span>
 					<span className="flex items-center justify-center w-4 shrink-0">
 						<span
@@ -64,10 +66,10 @@ function WorkspaceRow({
 			) : (
 				<>
 					<span className="text-muted-foreground text-xs shrink-0 w-20 text-left line-clamp-1">
-						Workspace
+						{tt("Workspace")}
 					</span>
 					<span className="truncate text-xs font-normal text-muted-foreground flex-1 min-w-0">
-						Unknown
+						{tt("Unknown")}
 					</span>
 				</>
 			)}
@@ -96,6 +98,7 @@ function TaskRow({
 	const task = taskData.find(
 		(t) => t.id === entry.entityId || t.slug === entry.entityId,
 	);
+	const { tt } = useI18n();
 
 	return (
 		<DropdownMenuItem
@@ -122,10 +125,10 @@ function TaskRow({
 			) : (
 				<>
 					<span className="text-muted-foreground text-xs shrink-0 w-20 text-left line-clamp-1">
-						Task
+						{tt("Task")}
 					</span>
 					<span className="truncate text-xs font-normal text-muted-foreground flex-1 min-w-0">
-						Unknown
+						{tt("Unknown")}
 					</span>
 				</>
 			)}
@@ -138,6 +141,7 @@ export function HistoryDropdown() {
 	const recentEntries = useRecentlyViewed(20);
 	const currentPath = useLocation({ select: (loc) => loc.pathname });
 	const collections = useCollections();
+	const { tt } = useI18n();
 
 	const { data: groups } = electronTrpc.workspaces.getAllGrouped.useQuery();
 	const workspaceData = (groups ?? []).flatMap((group) =>
@@ -188,7 +192,7 @@ export function HistoryDropdown() {
 						<LuHistory className="size-3.5" strokeWidth={1.5} />
 					</button>
 				</TooltipTrigger>
-				<TooltipContent side="bottom">Recently viewed</TooltipContent>
+				<TooltipContent side="bottom">{tt("Recently viewed")}</TooltipContent>
 			</Tooltip>
 		);
 	}
@@ -206,10 +210,10 @@ export function HistoryDropdown() {
 						</button>
 					</DropdownMenuTrigger>
 				</TooltipTrigger>
-				<TooltipContent side="bottom">Recently viewed</TooltipContent>
+				<TooltipContent side="bottom">{tt("Recently viewed")}</TooltipContent>
 			</Tooltip>
 			<DropdownMenuContent align="start" className="w-80">
-				<DropdownMenuLabel>Recently Viewed</DropdownMenuLabel>
+				<DropdownMenuLabel>{tt("Recently Viewed")}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				{filteredEntries.map((entry) =>
 					entry.type === "task" ? (

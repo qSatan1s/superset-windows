@@ -22,8 +22,7 @@ import {
 } from "../components/PaneContextMenuItems";
 
 function getModifierKeyLabel() {
-	const isMac = navigator.platform.toLowerCase().includes("mac");
-	return isMac ? "⌘" : "Ctrl+";
+	return "Ctrl+";
 }
 
 interface TabContentContextMenuProps {

@@ -2,9 +2,9 @@ import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
 import { getWorkspaceName } from "./env.shared";
 
 export const PLATFORM = {
-	IS_MAC: process.platform === "darwin",
-	IS_WINDOWS: process.platform === "win32",
-	IS_LINUX: process.platform === "linux",
+	IS_MAC: false,
+	IS_WINDOWS: true,
+	IS_LINUX: false,
 };
 
 const workspace = getWorkspaceName();

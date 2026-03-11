@@ -89,10 +89,7 @@ function createTrayIcon(): Electron.NativeImage | null {
 		if (size.width > 22 || size.height > 22) {
 			image = image.resize({ width: 16, height: 16 });
 		}
-		// Template image for macOS dark/light mode; not supported on Windows/Linux
-		if (process.platform === "darwin") {
-			image.setTemplateImage(true);
-		}
+
 		return image;
 	} catch (error) {
 		console.warn("[Tray] Failed to load icon:", error);

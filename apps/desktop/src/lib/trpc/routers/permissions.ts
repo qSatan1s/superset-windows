@@ -5,21 +5,11 @@ import { shell, systemPreferences } from "electron";
 import { publicProcedure, router } from "..";
 
 function checkFullDiskAccess(): boolean {
-	try {
-		// Safari bookmarks are TCC-protected — readable only with Full Disk Access
-		const tccProtectedPath = path.join(
-			homedir(),
-			"Library/Safari/Bookmarks.plist",
-		);
-		fs.accessSync(tccProtectedPath, fs.constants.R_OK);
-		return true;
-	} catch {
-		return false;
-	}
+	return true; // Not required on Windows
 }
 
 function checkAccessibility(): boolean {
-	return systemPreferences.isTrustedAccessibilityClient(false);
+	return true; // Not required on Windows
 }
 
 function checkMicrophone(): boolean {
@@ -41,47 +31,28 @@ export const createPermissionsRouter = () => {
 		}),
 
 		requestFullDiskAccess: publicProcedure.mutation(async () => {
-			await shell.openExternal(
-				"x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles",
-			);
+			// No-op for Windows
 		}),
 
 		requestAccessibility: publicProcedure.mutation(async () => {
-			await shell.openExternal(
-				"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
-			);
+			// No-op for Windows
 		}),
 
 		requestMicrophone: publicProcedure.mutation(async () => {
 			try {
-				if (process.platform === "darwin") {
-					const granted =
-						await systemPreferences.askForMediaAccess("microphone");
-					if (granted) {
-						return { granted: true };
-					}
-				}
+				const granted = await systemPreferences.askForMediaAccess("microphone");
+				return { granted };
 			} catch {
-				// Fall through to opening System Settings.
+				return { granted: false };
 			}
-
-			await shell.openExternal(
-				"x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone",
-			);
-			return { granted: false };
 		}),
 
 		requestAppleEvents: publicProcedure.mutation(async () => {
-			await shell.openExternal(
-				"x-apple.systempreferences:com.apple.preference.security?Privacy_Automation",
-			);
+			// No-op for Windows
 		}),
 
-		// No deep link exists for Local Network — open the general Privacy & Security pane
 		requestLocalNetwork: publicProcedure.mutation(async () => {
-			await shell.openExternal(
-				"x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension",
-			);
+			// No-op for Windows
 		}),
 	});
 };

@@ -32,6 +32,8 @@ agent commands and inject Superset-specific configuration.
 | `notify.sh` | Shell script called by agents when they complete or need input |
 | `cursor-hook.sh` | Cursor IDE hook (Unix) — lifecycle events for Superset integration |
 | `cursor-hook.ps1` | Cursor IDE hook (Windows) — same as above, runs without console window |
+| `gemini-hook.sh` | Gemini CLI hook (Unix) — lifecycle events for Superset integration |
+| `gemini-hook.ps1` | Gemini CLI hook (Windows) — same as above, runs without console window |
 | `claude-settings.json` | Claude Code settings file with hook configuration |
 | `opencode/plugin/superset-notify.js` | OpenCode plugin for lifecycle events |
 

@@ -31,6 +31,7 @@ import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHotkeyText } from "renderer/stores/hotkeys";
+import { useI18n } from "renderer/lib/i18n";
 
 export function OrganizationDropdown() {
 	const { data: session } = authClient.useSession();
@@ -39,6 +40,7 @@ export function OrganizationDropdown() {
 	const navigate = useNavigate();
 	const settingsHotkey = useHotkeyText("OPEN_SETTINGS");
 	const shortcutsHotkey = useHotkeyText("SHOW_HOTKEYS");
+	const { tt } = useI18n();
 
 	const activeOrganizationId = session?.session?.activeOrganizationId;
 
@@ -63,7 +65,7 @@ export function OrganizationDropdown() {
 	}
 
 	const userName = session?.user?.name;
-	const displayName = activeOrganization?.name ?? userName ?? "Organization";
+	const displayName = activeOrganization?.name ?? userName ?? tt("Organization");
 
 	return (
 		<DropdownMenu>
@@ -91,7 +93,7 @@ export function OrganizationDropdown() {
 					onSelect={() => navigate({ to: "/settings/account" })}
 				>
 					<HiOutlineCog6Tooth className="h-4 w-4" />
-					<span>Settings</span>
+					<span>{tt("Settings")}</span>
 					{settingsHotkey !== "Unassigned" && (
 						<DropdownMenuShortcut>{settingsHotkey}</DropdownMenuShortcut>
 					)}
@@ -100,12 +102,12 @@ export function OrganizationDropdown() {
 					onSelect={() => navigate({ to: "/settings/organization" })}
 				>
 					<FiUsers className="h-4 w-4" />
-					<span>Manage members</span>
+					<span>{tt("Manage members")}</span>
 				</DropdownMenuItem>
 				{organizations && organizations.length > 1 && (
 					<DropdownMenuSub>
 						<DropdownMenuSubTrigger className="gap-2">
-							<span>Switch organization</span>
+							<span>{tt("Switch organization")}</span>
 						</DropdownMenuSubTrigger>
 						<DropdownMenuSubContent>
 							{userEmail && (
@@ -142,13 +144,13 @@ export function OrganizationDropdown() {
 				{/* Help & Support */}
 				<DropdownMenuItem onClick={() => openExternal(COMPANY.DOCS_URL)}>
 					<HiOutlineBookOpen className="h-4 w-4" />
-					Documentation
+					{tt("Documentation")}
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() => navigate({ to: "/settings/keyboard" })}
 				>
 					<LuKeyboard className="h-4 w-4" />
-					Keyboard Shortcuts
+					{tt("Keyboard Shortcuts")}
 					{shortcutsHotkey !== "Unassigned" && (
 						<DropdownMenuShortcut>{shortcutsHotkey}</DropdownMenuShortcut>
 					)}
@@ -157,28 +159,28 @@ export function OrganizationDropdown() {
 					onClick={() => openExternal(COMPANY.REPORT_ISSUE_URL)}
 				>
 					<IoBugOutline className="h-4 w-4" />
-					Report Issue
+					{tt("Report Issue")}
 				</DropdownMenuItem>
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger>
 						<HiOutlineChatBubbleLeftRight className="h-4 w-4" />
-						Contact Us
+						{tt("Contact Us")}
 					</DropdownMenuSubTrigger>
 					<DropdownMenuSubContent sideOffset={8} className="w-56">
 						<DropdownMenuItem onClick={() => openExternal(COMPANY.GITHUB_URL)}>
 							<FaGithub className="h-4 w-4" />
-							GitHub
+							{tt("GitHub")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => openExternal(COMPANY.DISCORD_URL)}>
 							<FaDiscord className="h-4 w-4" />
-							Discord
+							{tt("Discord")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => openExternal(COMPANY.X_URL)}>
-							<FaXTwitter className="h-4 w-4" />X
+							<FaXTwitter className="h-4 w-4" />{tt("X")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => openExternal(COMPANY.MAIL_TO)}>
 							<HiOutlineEnvelope className="h-4 w-4" />
-							Email Founders
+							{tt("Email Founders")}
 						</DropdownMenuItem>
 					</DropdownMenuSubContent>
 				</DropdownMenuSub>
@@ -188,7 +190,7 @@ export function OrganizationDropdown() {
 				{/* Account */}
 				<DropdownMenuItem onSelect={handleSignOut} className="gap-2">
 					<HiOutlineArrowRightOnRectangle className="h-4 w-4" />
-					<span>Log out</span>
+					<span>{tt("Log out")}</span>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

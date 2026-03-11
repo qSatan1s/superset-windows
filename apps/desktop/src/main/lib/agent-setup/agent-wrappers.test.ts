@@ -288,7 +288,15 @@ describe("agent-wrappers copilot", () => {
 			"settings.json",
 		);
 		const staleHookPath = "/tmp/.superset-old/hooks/gemini-hook.sh";
-		const currentHookPath = "/tmp/.superset-new/hooks/gemini-hook.sh";
+		const currentHookPath =
+			process.platform === "win32"
+				? "/tmp/.superset-new/hooks/gemini-hook.ps1"
+				: "/tmp/.superset-new/hooks/gemini-hook.sh";
+
+		const expectedCommand =
+			process.platform === "win32"
+				? `powershell -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "${currentHookPath}"`
+				: currentHookPath;
 
 		mkdirSync(path.dirname(geminiSettingsPath), { recursive: true });
 		writeFileSync(
@@ -347,7 +355,7 @@ describe("agent-wrappers copilot", () => {
 				hooks.some(
 					(def) =>
 						def.hooks?.length === 1 &&
-						def.hooks[0]?.command === currentHookPath,
+						def.hooks[0]?.command === expectedCommand,
 				),
 			).toBe(true);
 			expect(
@@ -371,7 +379,7 @@ describe("agent-wrappers copilot", () => {
 				hooks.some(
 					(def) =>
 						def.hooks?.length === 1 &&
-						def.hooks[0]?.command === currentHookPath,
+						def.hooks[0]?.command === expectedCommand,
 				),
 			).toBe(true);
 			expect(

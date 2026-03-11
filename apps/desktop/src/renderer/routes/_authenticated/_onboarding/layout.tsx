@@ -6,8 +6,6 @@ export const Route = createFileRoute("/_authenticated/_onboarding")({
 });
 
 function OnboardingLayout() {
-	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
-	const isMac = platform === undefined || platform === "darwin";
 
 	return (
 		<div className="flex flex-col h-full w-full bg-background">
@@ -15,7 +13,7 @@ function OnboardingLayout() {
 			<div
 				className="drag h-12 w-full shrink-0"
 				style={{
-					paddingLeft: isMac ? "88px" : "16px",
+					paddingLeft: "16px",
 				}}
 			/>
 			<Outlet />

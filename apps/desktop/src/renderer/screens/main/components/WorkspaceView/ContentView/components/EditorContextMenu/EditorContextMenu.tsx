@@ -47,9 +47,7 @@ export function EditorContextMenu({
 	paneActions,
 	leadingItems,
 }: EditorContextMenuProps) {
-	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
-	const isMac = platform === "darwin";
-	const cmdKey = isMac ? "Cmd" : "Ctrl";
+	const cmdKey = "Ctrl";
 
 	const {
 		onCut,

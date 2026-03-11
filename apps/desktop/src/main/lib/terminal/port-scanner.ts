@@ -38,7 +38,7 @@ export async function getListeningPortsForPids(
 
 	const platform = os.platform();
 
-	if (platform === "darwin" || platform === "linux") {
+	if (platform === "linux") {
 		return getListeningPortsLsof(pids);
 	}
 	if (platform === "win32") {

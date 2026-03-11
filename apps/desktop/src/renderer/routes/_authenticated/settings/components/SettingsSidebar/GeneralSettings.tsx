@@ -156,13 +156,12 @@ export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 	const matchRoute = useMatchRoute();
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const { tt } = useI18n();
-	const isMac = platform === "darwin";
 
 	return (
 		<>
 			{SECTION_GROUPS.map((group, groupIndex) => {
 				const platformItems = group.items.filter(
-					(item) => !item.macOnly || isMac,
+					(item) => !item.macOnly,
 				);
 				const filteredItems = matchCounts
 					? platformItems.filter((item) => (matchCounts[item.section] ?? 0) > 0)

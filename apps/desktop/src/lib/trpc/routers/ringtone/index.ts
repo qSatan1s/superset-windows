@@ -59,14 +59,7 @@ function playSoundFile(soundPath: string): void {
 	const sessionId = nextSessionId++;
 	currentSession = { id: sessionId, process: null };
 
-	if (process.platform === "darwin") {
-		currentSession.process = execFile("afplay", [soundPath], () => {
-			// Only clear if this session is still active
-			if (currentSession?.id === sessionId) {
-				currentSession = null;
-			}
-		});
-	} else if (process.platform === "win32") {
+	if (process.platform === "win32") {
 		const escapedPath = soundPath.replace(/'/g, "''");
 		const script = [
 			"Add-Type -AssemblyName PresentationCore;",

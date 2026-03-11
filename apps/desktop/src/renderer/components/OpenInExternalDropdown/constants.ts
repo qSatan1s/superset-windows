@@ -1,6 +1,5 @@
 import type { ExternalApp } from "@superset/local-db";
 import antigravityIcon from "renderer/assets/app-icons/antigravity.svg";
-import appcodeIcon from "renderer/assets/app-icons/appcode.svg";
 import clionIcon from "renderer/assets/app-icons/clion.svg";
 import cursorIcon from "renderer/assets/app-icons/cursor.svg";
 import datagripIcon from "renderer/assets/app-icons/datagrip.svg";
@@ -9,7 +8,6 @@ import fleetIcon from "renderer/assets/app-icons/fleet.svg";
 import ghosttyIcon from "renderer/assets/app-icons/ghostty.svg";
 import golandIcon from "renderer/assets/app-icons/goland.svg";
 import intellijIcon from "renderer/assets/app-icons/intellij.svg";
-import itermIcon from "renderer/assets/app-icons/iterm.png";
 import phpstormIcon from "renderer/assets/app-icons/phpstorm.svg";
 import pycharmIcon from "renderer/assets/app-icons/pycharm.svg";
 import riderIcon from "renderer/assets/app-icons/rider.svg";
@@ -23,7 +21,6 @@ import warpIcon from "renderer/assets/app-icons/warp.png";
 import webstormIcon from "renderer/assets/app-icons/webstorm.svg";
 import windsurfIcon from "renderer/assets/app-icons/windsurf.svg";
 import windsurfWhiteIcon from "renderer/assets/app-icons/windsurf-white.svg";
-import xcodeIcon from "renderer/assets/app-icons/xcode.svg";
 import zedIcon from "renderer/assets/app-icons/zed.png";
 
 export interface OpenInExternalAppOption {
@@ -37,7 +34,7 @@ export interface OpenInExternalAppOption {
 export const FINDER_OPTIONS: OpenInExternalAppOption[] = [
 	{
 		id: "finder",
-		label: "Finder",
+		label: "Проводник",
 		lightIcon: finderIcon,
 		darkIcon: finderIcon,
 	},
@@ -69,15 +66,13 @@ export const IDE_OPTIONS: OpenInExternalAppOption[] = [
 		lightIcon: sublimeIcon,
 		darkIcon: sublimeIcon,
 	},
-	{ id: "xcode", label: "Xcode", lightIcon: xcodeIcon, darkIcon: xcodeIcon },
 ];
 
 export const TERMINAL_OPTIONS: OpenInExternalAppOption[] = [
-	{ id: "iterm", label: "iTerm", lightIcon: itermIcon, darkIcon: itermIcon },
 	{ id: "warp", label: "Warp", lightIcon: warpIcon, darkIcon: warpIcon },
 	{
 		id: "terminal",
-		label: "Terminal",
+		label: "Терминал",
 		lightIcon: terminalIcon,
 		darkIcon: terminalIcon,
 	},
@@ -156,12 +151,6 @@ export const JETBRAINS_OPTIONS: OpenInExternalAppOption[] = [
 		label: "DataGrip",
 		lightIcon: datagripIcon,
 		darkIcon: datagripIcon,
-	},
-	{
-		id: "appcode",
-		label: "AppCode",
-		lightIcon: appcodeIcon,
-		darkIcon: appcodeIcon,
 	},
 	{ id: "fleet", label: "Fleet", lightIcon: fleetIcon, darkIcon: fleetIcon },
 	{

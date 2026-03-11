@@ -237,7 +237,6 @@ const themeStateSchema = z.object({
 const hotkeysStateSchema = z.object({
 	version: z.number(),
 	byPlatform: z.object({
-		darwin: z.record(z.string(), z.string().nullable()).default({}),
 		win32: z.record(z.string(), z.string().nullable()).default({}),
 		linux: z.record(z.string(), z.string().nullable()).default({}),
 	}),
@@ -295,10 +294,6 @@ export const createUiStateRouter = () => {
 					const normalized: HotkeysState = {
 						version,
 						byPlatform: {
-							darwin: buildOverridesFromBindings(
-								input.byPlatform.darwin ?? {},
-								"darwin",
-							),
 							win32: buildOverridesFromBindings(
 								input.byPlatform.win32 ?? {},
 								"win32",

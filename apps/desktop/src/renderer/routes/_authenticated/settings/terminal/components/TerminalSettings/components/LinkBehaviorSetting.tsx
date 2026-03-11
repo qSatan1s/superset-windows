@@ -43,7 +43,7 @@ export function LinkBehaviorSetting() {
 					Terminal file links
 				</Label>
 				<p className="text-xs text-muted-foreground">
-					Choose how to open file paths when Cmd+clicking in the terminal
+					Choose how to open file paths when Ctrl+clicking in the terminal
 				</p>
 			</div>
 			<Select

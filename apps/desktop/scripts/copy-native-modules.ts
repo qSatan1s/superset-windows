@@ -178,7 +178,7 @@ async function copyAstGrepPlatformPackages(
 	if (platformPackages.length === 0) return;
 
 	// Determine which platform package we need for the target arch
-	const targetPlatformSuffix = `${TARGET_PLATFORM === "darwin" ? "darwin" : TARGET_PLATFORM === "win32" ? "win32" : "linux"}-${TARGET_ARCH}`;
+	const targetPlatformSuffix = `win32-${TARGET_ARCH}`;
 	const targetPkg = platformPackages.find((pkg) =>
 		pkg.name.includes(targetPlatformSuffix),
 	);
@@ -284,11 +284,7 @@ async function copyLibsqlDependencies(
 	);
 	if (existsSync(bunFlatLibsqlScopePath)) {
 		for (const entry of readdirSync(bunFlatLibsqlScopePath)) {
-			if (
-				!entry.includes("darwin") &&
-				!entry.includes("linux") &&
-				!entry.includes("win32")
-			) {
+			if (!entry.includes("win32")) {
 				continue;
 			}
 			copyModuleIfSymlink(nodeModulesDir, `@libsql/${entry}`, false);

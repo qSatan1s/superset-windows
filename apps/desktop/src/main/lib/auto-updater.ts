@@ -21,7 +21,7 @@ function isPrereleaseBuild(): boolean {
 }
 
 const IS_PRERELEASE = isPrereleaseBuild();
-const IS_AUTO_UPDATE_PLATFORM = PLATFORM.IS_MAC || PLATFORM.IS_LINUX;
+const IS_AUTO_UPDATE_PLATFORM = PLATFORM.IS_WINDOWS || PLATFORM.IS_MAC || PLATFORM.IS_LINUX;
 
 // Use explicit feed URLs to ensure we always fetch platform-specific manifests
 // (for example latest-mac.yml and latest-linux.yml) from the correct release.
@@ -131,7 +131,7 @@ export function checkForUpdatesInteractive(): void {
 		dialog.showMessageBox({
 			type: "info",
 			title: "Updates",
-			message: "Auto-updates are only available on macOS and Linux.",
+			message: "Автообновления недоступны на этой платформе.",
 		});
 		return;
 	}

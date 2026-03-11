@@ -192,55 +192,7 @@ export async function execWithShellEnv(
 			env: await getProcessEnvWithShellEnv(baseEnv),
 		});
 	} catch (error) {
-		// Only retry on ENOENT (command not found), only on macOS
-		// Skip if we've already successfully fixed PATH, or if a fix attempt is in progress
-		if (
-			process.platform !== "darwin" ||
-			pathFixSucceeded ||
-			pathFixAttempted ||
-			!(error instanceof Error) ||
-			!("code" in error) ||
-			error.code !== "ENOENT"
-		) {
-			throw error;
-		}
-
-		pathFixAttempted = true;
-		console.log("[shell-env] Command not found, deriving shell environment");
-
-		try {
-			const shellEnvResult = await getShellEnvironment({ forceRefresh: true });
-			const mergedShellEnv = await getProcessEnvWithShellEnv(
-				baseEnv,
-				shellEnvResult,
-			);
-
-			// Retry with fixed env (respect caller's other env vars, force PATH if present)
-			const retryEnv = shellEnvResult.PATH
-				? { ...mergedShellEnv, PATH: shellEnvResult.PATH }
-				: mergedShellEnv;
-
-			const result = await execFileAsync(cmd, args, {
-				...options,
-				encoding: "utf8",
-				env: retryEnv,
-			});
-
-			// Persist the fix to process.env only after the retry succeeds.
-			if (shellEnvResult.PATH) {
-				process.env.PATH = shellEnvResult.PATH;
-				pathFixSucceeded = true;
-				console.log("[shell-env] Fixed process.env.PATH for GUI app");
-			}
-			pathFixAttempted = false;
-			return result;
-		} catch (retryError) {
-			// Shell env derivation or retry failed - allow future retries
-			pathFixAttempted = false;
-			pathFixSucceeded = false;
-			console.error("[shell-env] Retry failed:", retryError);
-			throw retryError;
-		}
+		throw error;
 	}
 }
 

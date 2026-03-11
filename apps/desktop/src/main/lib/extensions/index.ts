@@ -41,20 +41,6 @@ function compareVersionLikeStrings(a: string, b: string): number {
 function getChromiumUserDataDirs(): string[] {
 	const homeDir = os.homedir();
 
-	if (process.platform === "darwin") {
-		return [
-			path.join(homeDir, "Library/Application Support/Google/Chrome"),
-			path.join(homeDir, "Library/Application Support/Google/Chrome Beta"),
-			path.join(homeDir, "Library/Application Support/Google/Chrome Canary"),
-			path.join(homeDir, "Library/Application Support/Chromium"),
-			path.join(
-				homeDir,
-				"Library/Application Support/BraveSoftware/Brave-Browser",
-			),
-			path.join(homeDir, "Library/Application Support/Arc/User Data"),
-		];
-	}
-
 	if (process.platform === "win32") {
 		const localAppData = process.env.LOCALAPPDATA;
 		if (!localAppData) return [];

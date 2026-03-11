@@ -39,7 +39,7 @@ interface HotkeysStoreState {
 
 const DEFAULT_STATE: HotkeysState = {
 	version: HOTKEYS_STATE_VERSION,
-	byPlatform: { darwin: {}, win32: {}, linux: {} },
+	byPlatform: { win32: {}, linux: {} },
 };
 
 function getOverridesForPlatform(

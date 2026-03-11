@@ -51,29 +51,23 @@ describe("deriveNonMacDefault", () => {
 });
 
 describe("hotkeyFromKeyboardEvent", () => {
-	it("captures a simple meta hotkey on mac", () => {
+	it("captures a simple event on windows", () => {
 		const keys = hotkeyFromKeyboardEvent(
 			{
 				key: "k",
 				code: "KeyK",
-				metaKey: true,
-				ctrlKey: false,
+				metaKey: false,
+				ctrlKey: true,
 				altKey: false,
 				shiftKey: false,
 			},
-			"darwin",
+			"win32",
 		);
-		expect(keys).toBe("meta+k");
+		expect(keys).toBe("ctrl+k");
 	});
 });
 
 describe("toElectronAccelerator", () => {
-	it("converts to electron accelerator for mac", () => {
-		expect(toElectronAccelerator("meta+shift+w", "darwin")).toBe(
-			"Command+Shift+W",
-		);
-	});
-
 	it("returns null for meta on non-mac", () => {
 		expect(toElectronAccelerator("meta+w", "win32")).toBeNull();
 	});

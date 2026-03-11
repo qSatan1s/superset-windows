@@ -60,9 +60,7 @@ function playSoundFile(soundPath: string): void {
 		return;
 	}
 
-	if (process.platform === "darwin") {
-		execFile("afplay", [soundPath]);
-	} else if (process.platform === "win32") {
+	if (process.platform === "win32") {
 		// SoundPlayer supports WAV only. Use MediaPlayer so built-in MP3 ringtones work.
 		const escapedPath = soundPath.replace(/'/g, "''");
 		const script = [

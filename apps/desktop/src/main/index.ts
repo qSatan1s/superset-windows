@@ -23,7 +23,6 @@ import {
 } from "shared/constants";
 import { setupAgentHooks } from "./lib/agent-setup";
 import { initAppState } from "./lib/app-state";
-import { requestAppleEventsAccess } from "./lib/apple-events-permission";
 import { setupAutoUpdater } from "./lib/auto-updater";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -107,32 +106,7 @@ function focusMainWindow(): void {
 	}
 }
 
-function registerWithMacOSNotificationCenter() {
-	if (!PLATFORM.IS_MAC || !Notification.isSupported()) return;
 
-	const registrationNotification = new Notification({
-		title: app.name,
-		body: " ",
-		silent: true,
-	});
-
-	let handled = false;
-	const cleanup = () => {
-		if (handled) return;
-		handled = true;
-		registrationNotification.close();
-	};
-
-	registrationNotification.on("show", () => {
-		cleanup();
-		console.log("[notifications] Registered with Notification Center");
-	});
-
-	// Fallback timeout in case macOS doesn't fire events
-	setTimeout(cleanup, 1000);
-
-	registrationNotification.show();
-}
 
 // macOS open-url can fire before the window exists (cold-start via protocol link).
 // Queue the URL and process it after initialization.
@@ -273,8 +247,6 @@ if (!gotTheLock) {
 
 	(async () => {
 		await app.whenReady();
-		registerWithMacOSNotificationCenter();
-		requestAppleEventsAccess();
 
 		// Must register on both default session and the app's custom partition
 		const iconProtocolHandler = (request: Request) => {

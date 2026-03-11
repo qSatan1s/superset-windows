@@ -153,36 +153,7 @@ export function createApplicationMenu() {
 		});
 	}
 
-	if (process.platform === "darwin") {
-		template.unshift({
-			label: app.name,
-			submenu: [
-				{ role: "about" },
-				{ type: "separator" },
-				{
-					label: "Settings...",
-					accelerator: openSettingsAccelerator,
-					click: () => {
-						menuEmitter.emit("open-settings");
-					},
-				},
-				{
-					label: "Check for Updates...",
-					click: () => {
-						checkForUpdatesInteractive();
-					},
-				},
-				{ type: "separator" },
-				{ role: "services" },
-				{ type: "separator" },
-				{ role: "hide" },
-				{ role: "hideOthers" },
-				{ role: "unhide" },
-				{ type: "separator" },
-				{ role: "quit" },
-			],
-		});
-	}
+
 
 	const menu = Menu.buildFromTemplate(template);
 	Menu.setApplicationMenu(menu);

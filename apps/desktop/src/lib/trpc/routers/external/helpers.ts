@@ -2,45 +2,6 @@ import { spawn } from "node:child_process";
 import nodePath from "node:path";
 import type { ExternalApp } from "@superset/local-db";
 
-/** Map of app IDs to their macOS application names */
-const MACOS_APP_NAMES: Record<ExternalApp, string | null> = {
-	finder: null, // Handled specially with shell.showItemInFolder
-	vscode: "Visual Studio Code",
-	"vscode-insiders": "Visual Studio Code - Insiders",
-	cursor: "Cursor",
-	antigravity: "Antigravity",
-	windsurf: "Windsurf",
-	zed: "Zed",
-	xcode: "Xcode",
-	iterm: "iTerm",
-	warp: "Warp",
-	terminal: "Terminal",
-	ghostty: "Ghostty",
-	sublime: "Sublime Text",
-	intellij: null, // Multi-edition, uses bundle IDs
-	webstorm: "WebStorm",
-	pycharm: null, // Multi-edition, uses bundle IDs
-	phpstorm: "PhpStorm",
-	rubymine: "RubyMine",
-	goland: "GoLand",
-	clion: "CLion",
-	rider: "Rider",
-	datagrip: "DataGrip",
-	appcode: "AppCode",
-	fleet: "Fleet",
-	rustrover: "RustRover",
-};
-
-/**
- * Bundle ID candidates for JetBrains IDEs with multiple editions.
- * `open -b <bundleId>` works regardless of the .app display name,
- * so "IntelliJ IDEA Ultimate.app" and "IntelliJ IDEA CE.app" both resolve correctly.
- */
-const BUNDLE_ID_CANDIDATES: Partial<Record<ExternalApp, string[]>> = {
-	intellij: ["com.jetbrains.intellij", "com.jetbrains.intellij.ce"],
-	pycharm: ["com.jetbrains.pycharm", "com.jetbrains.pycharm.ce"],
-};
-
 /** Map of app IDs to their Linux CLI commands */
 const LINUX_CLI_COMMANDS: Record<ExternalApp, string | null> = {
 	finder: null, // Handled specially with shell.showItemInFolder
@@ -131,20 +92,6 @@ export function getAppCommand(
 	targetPath: string,
 	platform: NodeJS.Platform = process.platform,
 ): { command: string; args: string[] }[] | null {
-	if (platform === "darwin") {
-		const bundleIds = BUNDLE_ID_CANDIDATES[app];
-		if (bundleIds) {
-			return bundleIds.map((id) => ({
-				command: "open",
-				args: ["-b", id, targetPath],
-			}));
-		}
-
-		const appName = MACOS_APP_NAMES[app];
-		if (!appName) return null;
-		return [{ command: "open", args: ["-a", appName, targetPath] }];
-	}
-
 	// Windows
 	if (platform === "win32") {
 		const winCandidates = WINDOWS_CLI_CANDIDATES[app];

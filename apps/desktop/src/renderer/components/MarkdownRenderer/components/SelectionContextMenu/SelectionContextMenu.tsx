@@ -15,8 +15,7 @@ import { useState } from "react";
 import { LuCopy } from "react-icons/lu";
 
 function getModifierKeyLabel() {
-	const isMac = navigator.platform.toLowerCase().includes("mac");
-	return isMac ? "⌘" : "Ctrl+";
+	return "Ctrl+";
 }
 
 interface SelectionContextMenuProps<T extends HTMLElement> {

@@ -9,15 +9,7 @@ function getRawMachineId(): string {
 	try {
 		const os = platform();
 
-		if (os === "darwin") {
-			const output = execFileSync(
-				"ioreg",
-				["-rd1", "-c", "IOPlatformExpertDevice"],
-				{ encoding: "utf8" },
-			);
-			const match = output.match(/"IOPlatformUUID"\s*=\s*"([^"]+)"/);
-			if (match?.[1]) return match[1];
-		} else if (os === "linux") {
+		if (os === "linux") {
 			try {
 				return readFileSync("/etc/machine-id", "utf8").trim();
 			} catch {
@@ -80,7 +72,7 @@ export function getHashedDeviceId(): string {
  */
 export function getDeviceName(): string {
 	const os = platform();
-	const osName = os === "darwin" ? "Mac" : os === "win32" ? "Windows" : "Linux";
+	const osName = os === "win32" ? "Windows" : "Linux";
 	const rawHostname = hostname();
 
 	// Use just the first segment if it looks like a local hostname

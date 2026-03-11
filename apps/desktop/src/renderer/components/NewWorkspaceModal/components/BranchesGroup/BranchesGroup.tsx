@@ -27,8 +27,7 @@ interface BranchesGroupProps {
 type BranchFilterMode = "all" | "worktrees";
 
 export function BranchesGroup({ projectId }: BranchesGroupProps) {
-	const platform = useHotkeysStore((state) => state.platform);
-	const modKey = platform === "darwin" ? "Cmd" : "Ctrl";
+	const modKey = "Ctrl";
 	const navigate = useNavigate();
 	const { tt } = useI18n();
 	const createBranchWorkspace = useCreateBranchWorkspace();

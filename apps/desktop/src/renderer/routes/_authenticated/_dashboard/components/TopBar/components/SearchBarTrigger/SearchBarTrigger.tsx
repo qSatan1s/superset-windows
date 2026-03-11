@@ -2,6 +2,7 @@ import { Kbd, KbdGroup } from "@superset/ui/kbd";
 import { useCallback } from "react";
 import { LuSearch } from "react-icons/lu";
 import { getHotkeyKeys, useHotkeyDisplay } from "renderer/stores/hotkeys";
+import { useI18n } from "renderer/lib/i18n";
 
 interface SearchBarTriggerProps {
 	workspaceName?: string;
@@ -38,6 +39,7 @@ function dispatchHotkeyEvent(keys: string) {
 export function SearchBarTrigger({ workspaceName }: SearchBarTriggerProps) {
 	const display = useHotkeyDisplay("QUICK_OPEN");
 	const isUnassigned = display.length === 1 && display[0] === "Unassigned";
+	const { tt } = useI18n();
 
 	const handleClick = useCallback(() => {
 		const keys = getHotkeyKeys("QUICK_OPEN");
@@ -47,8 +49,8 @@ export function SearchBarTrigger({ workspaceName }: SearchBarTriggerProps) {
 	}, []);
 
 	const fullPlaceholder = workspaceName
-		? `Search ${workspaceName}...`
-		: "Search files...";
+		? tt("Search {workspace}...", { workspace: workspaceName })
+		: tt("Search files...");
 
 	return (
 		<button
@@ -60,7 +62,7 @@ export function SearchBarTrigger({ workspaceName }: SearchBarTriggerProps) {
 			<span className="truncate text-xs hidden md:inline">
 				{fullPlaceholder}
 			</span>
-			<span className="truncate text-xs md:hidden">Search…</span>
+			<span className="truncate text-xs md:hidden">{tt("Search…")}</span>
 			{!isUnassigned && (
 				<KbdGroup className="ml-auto shrink-0 hidden md:flex">
 					{display.map((key) => (

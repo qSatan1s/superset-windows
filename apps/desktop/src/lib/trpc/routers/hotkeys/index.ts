@@ -19,7 +19,6 @@ const hotkeysExportSchema = z.object({
 	app: z.string(),
 	hotkeys: z
 		.object({
-			darwin: z.record(z.string(), z.string().nullable()).optional(),
 			win32: z.record(z.string(), z.string().nullable()).optional(),
 			linux: z.record(z.string(), z.string().nullable()).optional(),
 		})
@@ -102,7 +101,6 @@ export const createHotkeysRouter = (getWindow: () => BrowserWindow | null) => {
 					exportedAt: parsed.exportedAt,
 					app: parsed.app,
 					hotkeys: {
-						darwin: parsed.hotkeys?.darwin ?? {},
 						win32: parsed.hotkeys?.win32 ?? {},
 						linux: parsed.hotkeys?.linux ?? {},
 					},

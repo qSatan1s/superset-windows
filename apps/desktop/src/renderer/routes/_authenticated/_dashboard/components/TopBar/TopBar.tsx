@@ -3,6 +3,7 @@ import { HiOutlineWifi } from "react-icons/hi2";
 import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getWorkspaceDisplayName } from "renderer/lib/getWorkspaceDisplayName";
+import { useI18n } from "renderer/lib/i18n";
 import { NavigationControls } from "./components/NavigationControls";
 import { OpenInMenuButton } from "./components/OpenInMenuButton";
 import { OrganizationDropdown } from "./components/OrganizationDropdown";
@@ -19,15 +20,14 @@ export function TopBar() {
 		{ enabled: !!workspaceId },
 	);
 	const isOnline = useOnlineStatus();
-	// Default to Mac layout while loading to avoid overlap with traffic lights
-	const isMac = platform === undefined || platform === "darwin";
+	const { tt } = useI18n();
 
 	return (
 		<div className="drag gap-2 h-12 w-full flex items-center justify-between bg-muted/45 border-b border-border relative dark:bg-muted/35">
 			<div
 				className="flex items-center gap-1.5 h-full"
 				style={{
-					paddingLeft: isMac ? "88px" : "16px",
+					paddingLeft: "16px",
 				}}
 			>
 				<SidebarToggle />
@@ -57,7 +57,7 @@ export function TopBar() {
 				{!isOnline && (
 					<div className="no-drag flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
 						<HiOutlineWifi className="size-3.5" />
-						<span>Offline</span>
+						<span>{tt("Offline")}</span>
 					</div>
 				)}
 				{workspace?.worktreePath && (
@@ -68,7 +68,7 @@ export function TopBar() {
 					/>
 				)}
 				<OrganizationDropdown />
-				{!isMac && <WindowControls />}
+				<WindowControls />
 			</div>
 		</div>
 	);

@@ -115,7 +115,6 @@ export async function MainWindow() {
 		autoHideMenuBar: true,
 		frame: false,
 		titleBarStyle: "hidden",
-		trafficLightPosition: { x: 16, y: 16 },
 		webPreferences: {
 			preload: join(__dirname, "../preload/index.js"),
 			webviewTag: true,
@@ -129,11 +128,6 @@ export async function MainWindow() {
 	registerMenuHotkeyUpdates();
 
 	currentWindow = window;
-
-	// macOS Sequoia+: background throttling can corrupt GPU compositor layers
-	if (PLATFORM.IS_MAC) {
-		window.webContents.setBackgroundThrottling(false);
-	}
 
 	if (ipcHandler) {
 		ipcHandler.attachWindow(window);
@@ -209,16 +203,6 @@ export async function MainWindow() {
 				});
 			},
 		);
-
-	// macOS Sequoia+: occluded/minimized windows can lose compositor layers
-	if (PLATFORM.IS_MAC) {
-		window.on("restore", () => {
-			window.webContents.invalidate();
-		});
-		window.on("show", () => {
-			window.webContents.invalidate();
-		});
-	}
 
 	// Persist window bounds on move/resize so state survives app.exit(0)
 	// (which skips the close handler — e.g. electron-vite SIGTERM during dev).

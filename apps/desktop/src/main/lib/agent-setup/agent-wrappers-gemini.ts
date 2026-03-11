@@ -52,6 +52,10 @@ export function getGeminiHookScriptPath(): string {
 	return path.join(HOOKS_DIR, GEMINI_HOOK_SCRIPT_NAME);
 }
 
+export function getGeminiHookPs1ScriptPath(): string {
+	return path.join(HOOKS_DIR, GEMINI_HOOK_PS1_SCRIPT_NAME);
+}
+
 export function getGeminiSettingsJsonPath(): string {
 	return path.join(os.homedir(), ".gemini", "settings.json");
 }
@@ -61,6 +65,37 @@ export function getGeminiHookScriptContent(): string {
 	return template
 		.replace("{{MARKER}}", GEMINI_HOOK_MARKER)
 		.replace(/\{\{DEFAULT_PORT\}\}/g, String(env.DESKTOP_NOTIFICATIONS_PORT));
+}
+
+function getGeminiHookPs1Content(): string {
+	const template = fs.readFileSync(GEMINI_HOOK_PS1_TEMPLATE_PATH, "utf-8");
+	return template
+		.replace("{{MARKER}}", GEMINI_HOOK_MARKER)
+		.replace(/\{\{DEFAULT_PORT\}\}/g, String(env.DESKTOP_NOTIFICATIONS_PORT));
+}
+
+function buildGeminiHookCommand(scriptPath: string): string {
+	if (IS_WINDOWS) {
+		return `powershell -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "${scriptPath}"`;
+	}
+	return scriptPath;
+}
+
+function isGeminiHookManaged(definition: GeminiHookDefinition): boolean {
+	const commands = definition.hooks?.map((h) => h.command) ?? [];
+	for (const cmd of commands) {
+		if (!cmd) continue;
+		const normalized = cmd.replaceAll("\\", "/");
+		if (
+			normalized.includes("/hooks/gemini-hook.sh") ||
+			normalized.includes("/hooks/gemini-hook.ps1") ||
+			isSupersetManagedHookCommand(cmd, GEMINI_HOOK_SCRIPT_NAME) ||
+			isSupersetManagedHookCommand(cmd, GEMINI_HOOK_PS1_SCRIPT_NAME)
+		) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
@@ -88,29 +123,20 @@ export function getGeminiSettingsJsonContent(hookScriptPath: string): string {
 		existing.hooks = {};
 	}
 
+	const hookCommand = buildGeminiHookCommand(hookScriptPath);
 	const eventNames = ["BeforeAgent", "AfterAgent", "AfterTool"];
 
 	for (const eventName of eventNames) {
 		const current = existing.hooks[eventName];
 		const desiredEntries: GeminiHookDefinition[] = [
 			{
-				hooks: [{ type: "command", command: hookScriptPath }],
+				hooks: [{ type: "command", command: hookCommand }],
 			},
 		];
 		const { entries } = reconcileManagedEntries({
 			current,
 			desired: desiredEntries,
-			isManaged: (definition: GeminiHookDefinition) =>
-				Boolean(
-					definition.hooks?.some(
-						(hook) =>
-							hook.command?.includes(hookScriptPath) ||
-							isSupersetManagedHookCommand(
-								hook.command,
-								GEMINI_HOOK_SCRIPT_NAME,
-							),
-					),
-				),
+			isManaged: isGeminiHookManaged,
 			isEquivalent: (
 				definition: GeminiHookDefinition,
 				desiredDefinition: GeminiHookDefinition,
@@ -129,8 +155,17 @@ export function createGeminiHookScript(): void {
 	const content = getGeminiHookScriptContent();
 	const changed = writeFileIfChanged(scriptPath, content, 0o755);
 	console.log(
-		`[agent-setup] ${changed ? "Updated" : "Verified"} Gemini hook script`,
+		`[agent-setup] ${changed ? "Updated" : "Verified"} Gemini hook script (.sh)`,
 	);
+
+	if (IS_WINDOWS) {
+		const ps1Path = getGeminiHookPs1ScriptPath();
+		const ps1Content = getGeminiHookPs1Content();
+		const ps1Changed = writeFileIfChanged(ps1Path, ps1Content, 0o644);
+		console.log(
+			`[agent-setup] ${ps1Changed ? "Updated" : "Verified"} Gemini hook script (.ps1)`,
+		);
+	}
 }
 
 export function createGeminiWrapper(): void {
@@ -139,8 +174,16 @@ export function createGeminiWrapper(): void {
 }
 
 export function createGeminiSettingsJson(): void {
-	const hookScriptPath = getGeminiHookScriptPath();
+	const hookScriptPath = IS_WINDOWS
+		? getGeminiHookPs1ScriptPath()
+		: getGeminiHookScriptPath();
 	const globalPath = getGeminiSettingsJsonPath();
 	const content = getGeminiSettingsJsonContent(hookScriptPath);
 
-	const dir = path.dirn
+	const dir = path.dirname(globalPath);
+	fs.mkdirSync(dir, { recursive: true });
+	const changed = writeFileIfChanged(globalPath, content, 0o644);
+	console.log(
+		`[agent-setup] ${changed ? "Updated" : "Verified"} Gemini settings.json`,
+	);
+}

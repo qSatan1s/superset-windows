@@ -47,8 +47,7 @@ interface PromptGroupProps {
 
 export function PromptGroup({ projectId }: PromptGroupProps) {
 	const navigate = useNavigate();
-	const platform = useHotkeysStore((state) => state.platform);
-	const modKey = platform === "darwin" ? "Cmd" : "Ctrl";
+	const modKey = "Ctrl";
 	const isDark = useIsDarkTheme();
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const { tt } = useI18n();

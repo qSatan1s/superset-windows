@@ -16,6 +16,7 @@ import {
 	OpenInExternalDropdownItems,
 } from "renderer/components/OpenInExternalDropdown";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { useI18n } from "renderer/lib/i18n";
 import { useThemeStore } from "renderer/stores";
 import { useHotkeyText } from "renderer/stores/hotkeys";
 
@@ -32,6 +33,7 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 }: OpenInMenuButtonProps) {
 	const activeTheme = useThemeStore((state) => state.activeTheme);
 	const utils = electronTrpc.useUtils();
+	const { tt } = useI18n();
 	const { data: defaultApp } = electronTrpc.projects.getDefaultApp.useQuery(
 		{ projectId: projectId as string },
 		{ enabled: !!projectId, staleTime: 30000 },
@@ -42,11 +44,11 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 				utils.projects.getDefaultApp.invalidate({ projectId });
 			}
 		},
-		onError: (error) => toast.error(`Failed to open: ${error.message}`),
+		onError: (error) => toast.error(tt("Failed to open: ") + error.message),
 	});
 	const copyPath = electronTrpc.external.copyPath.useMutation({
-		onSuccess: () => toast.success("Path copied to clipboard"),
-		onError: (error) => toast.error(`Failed to copy path: ${error.message}`),
+		onSuccess: () => toast.success(tt("Path copied to clipboard")),
+		onError: (error) => toast.error(`${tt("Failed to copy path:")} ${error.message}`),
 	});
 
 	const currentApp = useMemo(
@@ -64,8 +66,8 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 	const handleOpenInEditor = useCallback(() => {
 		if (openInApp.isPending || copyPath.isPending) return;
 		if (!defaultApp) {
-			toast.error("No default editor configured", {
-				description: "Open a project in an editor first to set a default.",
+			toast.error(tt("No default editor configured"), {
+				description: tt("Open a project in an editor first to set a default."),
 			});
 			return;
 		}
@@ -96,8 +98,8 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 						disabled={isLoading || !currentApp}
 						aria-label={
 							currentApp
-								? `Open in ${currentApp.displayLabel ?? currentApp.label}`
-								: "Open in editor"
+								? tt("Open in {app}", { app: currentApp.displayLabel ?? currentApp.label })
+								: tt("Open in editor")
 						}
 						className={cn(
 							"group flex items-center gap-1.5 h-6 px-1.5 sm:pl-1.5 sm:pr-2 rounded-l border border-r-0 border-border/60 bg-secondary/50 text-xs font-medium",
@@ -124,7 +126,7 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 							</span>
 						)}
 						<span className="hidden sm:inline text-foreground font-medium">
-							Open
+							{tt("Open")}
 						</span>
 					</button>
 				</TooltipTrigger>
@@ -132,8 +134,8 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 					<div className="flex flex-col gap-1">
 						<span className="flex items-center gap-1.5">
 							{currentApp
-								? `Open in ${currentApp.displayLabel ?? currentApp.label}`
-								: "Select an editor from the dropdown"}
+								? tt("Open in {app}", { app: currentApp.displayLabel ?? currentApp.label })
+								: tt("Select an editor from the dropdown")}
 							{currentApp && showOpenInShortcut && (
 								<kbd className="px-1 py-0.5 text-[10px] font-mono bg-foreground/10 text-foreground/70 rounded">
 									{openInShortcut}

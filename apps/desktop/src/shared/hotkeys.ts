@@ -5,7 +5,7 @@
 
 import { PLATFORM } from "./constants";
 
-export type HotkeyPlatform = "darwin" | "win32" | "linux";
+export type HotkeyPlatform = "win32" | "linux";
 
 export type HotkeyCategory =
 	| "Navigation"
@@ -74,7 +74,6 @@ const KEY_ALIAS_MAP: Record<string, string> = {
 };
 
 const MODIFIER_DISPLAY_MAP: Record<HotkeyPlatform, Record<string, string>> = {
-	darwin: { meta: "⌘", ctrl: "⌃", alt: "⌥", shift: "⇧" },
 	win32: { meta: "Win", ctrl: "Ctrl", alt: "Alt", shift: "Shift" },
 	linux: { meta: "Super", ctrl: "Ctrl", alt: "Alt", shift: "Shift" },
 };
@@ -133,7 +132,6 @@ function isFunctionKey(key: string): boolean {
 }
 
 const OS_RESERVED_CHORDS: Record<HotkeyPlatform, string[]> = {
-	darwin: ["meta+q", "meta+space", "meta+tab"],
 	win32: ["alt+f4", "alt+tab", "ctrl+alt+delete"],
 	linux: ["alt+f4", "alt+tab"],
 };
@@ -184,9 +182,7 @@ function formatHotkeyString(modifiers: Set<string>, key: string): string {
 }
 
 export function getCurrentPlatform(): HotkeyPlatform {
-	if (PLATFORM.IS_MAC) return "darwin";
-	if (PLATFORM.IS_WINDOWS) return "win32";
-	return "linux";
+	return "win32";
 }
 
 export function canonicalizeHotkey(keys: string): string | null {
@@ -201,7 +197,7 @@ export function canonicalizeHotkeyForPlatform(
 ): string | null {
 	const canonical = canonicalizeHotkey(keys);
 	if (!canonical) return null;
-	if (platform !== "darwin" && canonical.includes("meta+")) return null;
+	if (canonical.includes("meta+")) return null;
 	return canonical;
 }
 
@@ -232,7 +228,7 @@ export function formatHotkeyText(
 	if (display.length === 1 && display[0] === "Unassigned") {
 		return "Unassigned";
 	}
-	return platform === "darwin" ? display.join("") : display.join("+");
+	return display.join("+");
 }
 
 export function matchesHotkeyEvent(
@@ -372,15 +368,13 @@ function defineHotkey(def: {
 	defaults?: Partial<Record<HotkeyPlatform, string | null>>;
 	isHidden?: boolean;
 }): HotkeyDefinition {
-	const darwin = def.keys;
-	const win32 = def.defaults?.win32 ?? deriveNonMacDefault(darwin);
-	const linux = def.defaults?.linux ?? deriveNonMacDefault(darwin);
+	const win32 = def.defaults?.win32 ?? deriveNonMacDefault(def.keys);
+	const linux = def.defaults?.linux ?? deriveNonMacDefault(def.keys);
 	return {
 		label: def.label,
 		category: def.category,
 		description: def.description,
 		defaults: {
-			darwin,
 			win32: win32 ?? null,
 			linux: linux ?? null,
 		},
@@ -799,7 +793,6 @@ export const HOTKEYS = {
 		label: "Open Settings",
 		category: "Help",
 		defaults: {
-			darwin: "meta+,",
 			win32: "ctrl+,",
 			linux: "ctrl+,",
 		},
@@ -923,7 +916,6 @@ export function createDefaultHotkeysState(): HotkeysState {
 	return {
 		version: HOTKEYS_STATE_VERSION,
 		byPlatform: {
-			darwin: {},
 			win32: {},
 			linux: {},
 		},
@@ -938,7 +930,6 @@ export function createHotkeysExport(
 		exportedAt: new Date().toISOString(),
 		app: "@superset/desktop",
 		hotkeys: {
-			darwin: getEffectiveHotkeysMap(hotkeysState.byPlatform.darwin, "darwin"),
 			win32: getEffectiveHotkeysMap(hotkeysState.byPlatform.win32, "win32"),
 			linux: getEffectiveHotkeysMap(hotkeysState.byPlatform.linux, "linux"),
 		},
@@ -951,10 +942,6 @@ export function buildHotkeysStateFromExport(
 	return {
 		version: HOTKEYS_STATE_VERSION,
 		byPlatform: {
-			darwin: buildOverridesFromBindings(
-				exportFile.hotkeys.darwin ?? {},
-				"darwin",
-			),
 			win32: buildOverridesFromBindings(
 				exportFile.hotkeys.win32 ?? {},
 				"win32",
@@ -991,7 +978,7 @@ export function toElectronAccelerator(
 	if (!keys) return null;
 	const canonical = canonicalizeHotkey(keys);
 	if (!canonical) return null;
-	if (platform !== "darwin" && canonical.includes("meta+")) return null;
+	if (canonical.includes("meta+")) return null;
 
 	const { modifiers, key } = parseHotkeyString(canonical);
 	if (!key) return null;

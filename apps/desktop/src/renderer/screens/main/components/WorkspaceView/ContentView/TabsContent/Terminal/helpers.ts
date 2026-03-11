@@ -528,7 +528,6 @@ export function setupKeyboardHandler(
 ): () => void {
 	const platform =
 		typeof navigator !== "undefined" ? navigator.platform.toLowerCase() : "";
-	const isMac = platform.includes("mac");
 	const isWindows = platform.includes("win");
 
 	const handler = (event: KeyboardEvent): boolean => {
@@ -543,85 +542,6 @@ export function setupKeyboardHandler(
 			if (event.type === "keydown" && options.onShiftEnter) {
 				event.preventDefault();
 				options.onShiftEnter();
-			}
-			return false;
-		}
-
-		const isCmdBackspace =
-			event.key === "Backspace" &&
-			event.metaKey &&
-			!event.ctrlKey &&
-			!event.altKey &&
-			!event.shiftKey;
-
-		if (isCmdBackspace) {
-			if (event.type === "keydown" && options.onWrite) {
-				event.preventDefault();
-				options.onWrite("\x15\x1b[D"); // Ctrl+U + left arrow
-			}
-			return false;
-		}
-
-		// Cmd+Left: Move cursor to beginning of line (sends Ctrl+A)
-		const isCmdLeft =
-			event.key === "ArrowLeft" &&
-			event.metaKey &&
-			!event.ctrlKey &&
-			!event.altKey &&
-			!event.shiftKey;
-
-		if (isCmdLeft) {
-			if (event.type === "keydown" && options.onWrite) {
-				event.preventDefault();
-				options.onWrite("\x01"); // Ctrl+A - beginning of line
-			}
-			return false;
-		}
-
-		// Cmd+Right: Move cursor to end of line (sends Ctrl+E)
-		const isCmdRight =
-			event.key === "ArrowRight" &&
-			event.metaKey &&
-			!event.ctrlKey &&
-			!event.altKey &&
-			!event.shiftKey;
-
-		if (isCmdRight) {
-			if (event.type === "keydown" && options.onWrite) {
-				event.preventDefault();
-				options.onWrite("\x05"); // Ctrl+E - end of line
-			}
-			return false;
-		}
-
-		// Option+Left/Right (macOS): word navigation (Meta+B / Meta+F)
-		const isOptionLeft =
-			event.key === "ArrowLeft" &&
-			event.altKey &&
-			isMac &&
-			!event.metaKey &&
-			!event.ctrlKey &&
-			!event.shiftKey;
-
-		if (isOptionLeft) {
-			if (event.type === "keydown" && options.onWrite) {
-				options.onWrite("\x1bb"); // Meta+B - backward word
-			}
-			return false;
-		}
-
-		// Option+Right: Move cursor forward by word (Meta+F)
-		const isOptionRight =
-			event.key === "ArrowRight" &&
-			event.altKey &&
-			isMac &&
-			!event.metaKey &&
-			!event.ctrlKey &&
-			!event.shiftKey;
-
-		if (isOptionRight) {
-			if (event.type === "keydown" && options.onWrite) {
-				options.onWrite("\x1bf"); // Meta+F - forward word
 			}
 			return false;
 		}
