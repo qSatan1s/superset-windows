@@ -398,7 +398,8 @@ describe("createWorktree hook tolerance", () => {
 		}
 	});
 
-	test("continues when post-checkout hook fails but worktree is created", async () => {
+	// Skip on Windows - uses chmod which doesn't work on Windows
+	testUnix("continues when post-checkout hook fails but worktree is created", async () => {
 		const repoPath = createTestRepo("worktree-hook-failure");
 		seedCommit(repoPath);
 

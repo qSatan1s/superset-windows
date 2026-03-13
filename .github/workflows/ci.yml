@@ -160,4 +160,5 @@ jobs:
       - name: Build Desktop
         env:
           NEXT_PUBLIC_OUTLIT_KEY: ${{ secrets.NEXT_PUBLIC_OUTLIT_KEY || 'ci-outlit-placeholder-key' }}
+          NODE_OPTIONS: "--max_old_space_size=8192"
         run: bun turbo run build --filter=@superset/desktop
