@@ -9,7 +9,6 @@
  * Needed because app.setAsDefaultProtocolClient() only works when packaged.
  */
 
-import { Database as BunSqliteDatabase } from "bun:sqlite";
 import { execSync } from "node:child_process";
 import {
 	existsSync,
@@ -90,9 +89,13 @@ export function getWorkspaceDisplayNameFromProdDb(
 	worktreePath: string,
 	prodDbPath = DEFAULT_PROD_DB_PATH,
 ): string | undefined {
+	// Skip on non-macOS - this function is only needed for macOS deep linking
+	if (process.platform !== "darwin") return undefined;
 	if (!existsSync(prodDbPath)) return undefined;
 
 	try {
+		// Lazy import to avoid bun:sqlite issues on Windows
+		const { Database: BunSqliteDatabase } = require("bun:sqlite");
 		const prodDb = new BunSqliteDatabase(prodDbPath, {
 			readonly: true,
 			create: false,
