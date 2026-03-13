@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { bootstrapOpenWorktree } from "./bootstrap-open-worktree";
 
+// Get the expected line ending for the current platform
+const isWindowsTest =
+	typeof process !== "undefined" && process.platform === "win32";
+
 describe("bootstrapOpenWorktree", () => {
 	const originalConsoleError = console.error;
 
@@ -64,9 +68,11 @@ describe("bootstrapOpenWorktree", () => {
 		});
 
 		expect(error).toBeNull();
+		// Windows uses \r, Unix uses \n
+		const expectedLineEnd = isWindowsTest ? "\r" : "\n";
 		expect(writeToTerminal).toHaveBeenCalledWith({
 			paneId: "pane-1",
-			data: "echo setup\n",
+			data: `echo setup${expectedLineEnd}`,
 			throwOnError: true,
 		});
 	});

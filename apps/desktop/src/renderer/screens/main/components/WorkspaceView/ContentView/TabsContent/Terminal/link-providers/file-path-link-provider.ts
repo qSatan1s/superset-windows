@@ -239,12 +239,36 @@ export class FilePathLinkProvider implements ILinkProvider {
 		}
 
 		// Check if this is part of a URL (e.g., the path portion after ://)
+		// This handles cases like http://example.com/path where /example.com/path is detected
 		if (
 			linkStart > 0 &&
 			combinedText[linkStart - 1] === ":" &&
-			(pathText.startsWith("//") || pathText.startsWith("http"))
+			(pathText.startsWith("//") || pathText.startsWith("/"))
 		) {
 			return true;
+		}
+
+		// Check if this path starts with // and is preceded by : (URL pattern like ://host/path)
+		if (
+			linkStart > 1 &&
+			pathText.startsWith("/") &&
+			combinedText[linkStart - 1] === "/" &&
+			combinedText[linkStart - 2] === ":"
+		) {
+			return true;
+		}
+
+		// Check if this path is part of a URL (e.g., /path in http://example.com/path)
+		// Look for :// pattern in the context before
+		if (linkStart > 5) {
+			const contextBefore = combinedText.substring(
+				Math.max(0, linkStart - 200),
+				linkStart,
+			);
+			// Match URLs like http://..., https://..., ftp://...
+			if (/(?:https?|ftp):\/\//.test(contextBefore)) {
+				return true;
+			}
 		}
 
 		return false;

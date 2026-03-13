@@ -81,6 +81,7 @@ jobs:
         working-directory: apps/desktop
         env:
           SUPERSET_WORKSPACE_NAME: superset
+          NODE_OPTIONS: "--max_old_space_size=8192"
         run: bun run compile:app
 
       - name: Build Electron app

@@ -1,11 +1,33 @@
-import { describe, expect, it, mock } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import {
 	buildTerminalCommand,
 	launchCommandInPane,
 	writeCommandsInPane,
 } from "./launch-command";
 
+// Get the expected line ending for the current platform
+// In tests, navigator may not be defined, but on Windows process.platform is "win32"
+const isWindowsTest =
+	typeof process !== "undefined" && process.platform === "win32";
+
 describe("launchCommandInPane", () => {
+	const originalNavigator = globalThis.navigator;
+
+	beforeEach(() => {
+		// Mock navigator for consistent test behavior
+		if (isWindowsTest) {
+			// @ts-expect-error - mocking navigator for tests
+			globalThis.navigator = { platform: "Win32" };
+		} else {
+			// @ts-expect-error - mocking navigator for tests
+			globalThis.navigator = { platform: "MacIntel" };
+		}
+	});
+
+	afterEach(() => {
+		globalThis.navigator = originalNavigator;
+	});
+
 	it("creates a terminal session and writes the command with a newline", async () => {
 		const createOrAttach = mock(async () => ({}));
 		const write = mock(async () => ({}));
@@ -24,9 +46,11 @@ describe("launchCommandInPane", () => {
 			tabId: "tab-1",
 			workspaceId: "ws-1",
 		});
+		// Windows uses \r, Unix uses \n
+		const expectedLineEnd = isWindowsTest ? "\r" : "\n";
 		expect(write).toHaveBeenCalledWith({
 			paneId: "pane-1",
-			data: "echo hello\n",
+			data: `echo hello${expectedLineEnd}`,
 			throwOnError: true,
 		});
 	});
@@ -44,9 +68,11 @@ describe("launchCommandInPane", () => {
 			write,
 		});
 
+		// On Windows, \n at end is converted to \r
+		const expectedData = isWindowsTest ? "echo hello\r" : "echo hello\n";
 		expect(write).toHaveBeenCalledWith({
 			paneId: "pane-1",
-			data: "echo hello\n",
+			data: expectedData,
 			throwOnError: true,
 		});
 	});
@@ -76,9 +102,11 @@ describe("writeCommandsInPane", () => {
 			write,
 		});
 
+		// Windows uses \r, Unix uses \n
+		const expectedLineEnd = isWindowsTest ? "\r" : "\n";
 		expect(write).toHaveBeenCalledWith({
 			paneId: "pane-1",
-			data: "echo one && echo two\n",
+			data: `echo one && echo two${expectedLineEnd}`,
 			throwOnError: true,
 		});
 	});

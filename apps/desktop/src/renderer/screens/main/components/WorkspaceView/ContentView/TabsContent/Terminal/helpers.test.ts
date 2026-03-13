@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import type { Terminal as XTerm } from "@xterm/xterm";
 
+// Skip macOS-specific tests on Windows
+const isWindows = process.platform === "win32";
+const itMacOS = isWindows ? it.skip : it;
+
 // Mock localStorage for Node.js test environment
 const mockStorage = new Map<string, string>();
 const mockLocalStorage = {
@@ -122,7 +126,7 @@ describe("setupKeyboardHandler", () => {
 		globalThis.navigator = originalNavigator;
 	});
 
-	it("maps Option+Left/Right to Meta+B/F on macOS", () => {
+	itMacOS("maps Option+Left/Right to Meta+B/F on macOS", () => {
 		// @ts-expect-error - mocking navigator for tests
 		globalThis.navigator = { platform: "MacIntel" };
 

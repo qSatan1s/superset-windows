@@ -1,4 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+
+// Skip Unix-specific tests on Windows
+const isWindows = process.platform === "win32";
+const testUnix = isWindows ? test.skip : test;
 import { execSync } from "node:child_process";
 import {
 	existsSync,
@@ -281,7 +285,8 @@ describe("Shell Environment", () => {
 		}
 	});
 
-	test("getShellEnvironment PATH includes homebrew and user-installed tools", async () => {
+	// Skip on Windows - homebrew/linuxbrew are macOS/Linux only
+	testUnix("getShellEnvironment PATH includes homebrew and user-installed tools", async () => {
 		const { clearShellEnvCache, getShellEnvironment } = await import(
 			"./shell-env"
 		);
