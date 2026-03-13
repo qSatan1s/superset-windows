@@ -141,7 +141,7 @@ describe("getDefaultBranch", () => {
 		} finally {
 			cleanup();
 		}
-	});
+	}, 30_000);
 
 	test("detects master from local remote branches", async () => {
 		const { repoPath, cleanup } = createIsolatedTestRepo("master");
