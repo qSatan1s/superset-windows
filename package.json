@@ -23,7 +23,7 @@
 		"dev:marketing": "turbo dev --filter=@superset/marketing --filter=@superset/docs",
 		"build": "turbo build --filter=@superset/desktop",
 		"test": "turbo test",
-		"lint": "./scripts/lint.sh",
+		"lint": "bunx @biomejs/biome@2.4.2 check .",
 		"lint:fix": "bunx @biomejs/biome@2.4.2 migrate --write && bunx @biomejs/biome@2.4.2 check --write --unsafe .",
 		"format": "bunx @biomejs/biome@2.4.2 format --write .",
 		"format:check": "bunx @biomejs/biome@2.4.2 format .",

@@ -1,4 +1,8 @@
 import { describe, expect, test } from "bun:test";
+
+// Skip zsh-specific tests on Windows
+const isWindows = process.platform === "win32";
+const describeUnix = isWindows ? describe.skip : describe;
 import {
 	existsSync,
 	mkdtempSync,
@@ -56,7 +60,7 @@ describe("shell env merging", () => {
 	});
 });
 
-describe("shell env cache", () => {
+describeUnix("shell env cache", () => {
 	test("getShellEnvironment forceRefresh bypasses cached values", async () => {
 		const { clearShellEnvCache, getShellEnvironment } = await import(
 			"./shell-env"

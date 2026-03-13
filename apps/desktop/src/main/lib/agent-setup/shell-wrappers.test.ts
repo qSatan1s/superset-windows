@@ -1,4 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, test } from "bun:test";
+
+// Skip all tests on Windows - these test Unix shell wrappers
+const isWindows = process.platform === "win32";
+const describeUnix = isWindows ? describe.skip : describe;
 import { execFileSync } from "node:child_process";
 import {
 	chmodSync,
@@ -52,7 +56,7 @@ function isZshAvailable(): boolean {
 	}
 }
 
-describe("shell-wrappers", () => {
+describeUnix("shell-wrappers", () => {
 	beforeEach(() => {
 		mkdirSync(TEST_BIN_DIR, { recursive: true });
 		mkdirSync(TEST_ZSH_DIR, { recursive: true });

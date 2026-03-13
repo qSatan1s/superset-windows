@@ -1,4 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+
+// Skip all tests on Windows - these test Unix shell commands
+const isWindows = process.platform === "win32";
+const describeUnix = isWindows ? describe.skip : describe;
 import {
 	chmodSync,
 	existsSync,
@@ -29,7 +33,7 @@ const ORIGINAL_HOME = process.env.HOME;
 
 const { runTeardown } = await import("./teardown");
 
-describe("runTeardown", () => {
+describeUnix("runTeardown", () => {
 	beforeEach(() => {
 		process.env.SUPERSET_HOME_DIR = TEST_SUPERSET_HOME;
 		// Create test directories

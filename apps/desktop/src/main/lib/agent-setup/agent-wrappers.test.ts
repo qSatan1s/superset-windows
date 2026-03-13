@@ -1,4 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+
+// Skip Unix-specific tests on Windows
+const isWindows = process.platform === "win32";
+const describeUnix = isWindows ? describe.skip : describe;
 import { execFileSync } from "node:child_process";
 import {
 	chmodSync,
@@ -109,7 +113,7 @@ describe("reconcileManagedEntries", () => {
 	});
 });
 
-describe("agent-wrappers copilot", () => {
+describeUnix("agent-wrappers copilot", () => {
 	beforeEach(() => {
 		mockedHomeDir = path.join(TEST_ROOT, "home");
 		mkdirSync(TEST_BIN_DIR, { recursive: true });
