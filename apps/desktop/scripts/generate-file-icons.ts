@@ -84,3 +84,5 @@ function run() {
 }
 
 run();
+// Explicit exit to avoid Bun cleanup issues on Windows
+process.exit(0);
