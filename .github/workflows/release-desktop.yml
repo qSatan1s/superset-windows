@@ -97,4 +97,4 @@ jobs:
             release-artifacts/* \
             --title "Superset Desktop ${{ github.ref_name }}" \
             --notes-file release_notes.md \
-            --draft
+            --latest
