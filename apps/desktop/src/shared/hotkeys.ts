@@ -3,8 +3,6 @@
  * Used both for registering shortcuts and displaying in the hotkey modal.
  */
 
-import { PLATFORM } from "./constants";
-
 export type HotkeyPlatform = "win32" | "linux";
 
 export type HotkeyCategory =
@@ -193,7 +191,7 @@ export function canonicalizeHotkey(keys: string): string | null {
 
 export function canonicalizeHotkeyForPlatform(
 	keys: string,
-	platform: HotkeyPlatform,
+	_platform: HotkeyPlatform,
 ): string | null {
 	const canonical = canonicalizeHotkey(keys);
 	if (!canonical) return null;
@@ -973,7 +971,7 @@ export function getHotkeysSummary(bindings: Record<HotkeyId, string | null>): {
 
 export function toElectronAccelerator(
 	keys: string | null,
-	platform: HotkeyPlatform,
+	_platform: HotkeyPlatform,
 ): string | null {
 	if (!keys) return null;
 	const canonical = canonicalizeHotkey(keys);

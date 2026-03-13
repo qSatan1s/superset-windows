@@ -1,5 +1,5 @@
 import { COMPANY } from "@superset/shared/constants";
-import { app, BrowserWindow, Menu, shell } from "electron";
+import { BrowserWindow, Menu, shell } from "electron";
 import { env } from "main/env.main";
 import { appState } from "main/lib/app-state";
 import { hotkeysEmitter } from "main/lib/hotkeys-events";
@@ -11,7 +11,6 @@ import {
 	toElectronAccelerator,
 } from "shared/hotkeys";
 import {
-	checkForUpdatesInteractive,
 	simulateDownloading,
 	simulateError,
 	simulateUpdateReady,
@@ -39,7 +38,7 @@ export function registerMenuHotkeyUpdates() {
 export function createApplicationMenu() {
 	const closeAccelerator = getMenuAccelerator("CLOSE_WINDOW");
 	const showHotkeysAccelerator = getMenuAccelerator("SHOW_HOTKEYS");
-	const openSettingsAccelerator = getMenuAccelerator("OPEN_SETTINGS");
+	const _openSettingsAccelerator = getMenuAccelerator("OPEN_SETTINGS");
 
 	const template: Electron.MenuItemConstructorOptions[] = [
 		{
@@ -152,8 +151,6 @@ export function createApplicationMenu() {
 			],
 		});
 	}
-
-
 
 	const menu = Menu.buildFromTemplate(template);
 	Menu.setApplicationMenu(menu);

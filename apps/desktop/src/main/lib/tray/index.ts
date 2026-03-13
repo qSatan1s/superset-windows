@@ -35,7 +35,10 @@ function getTrayIconPath(): string | null {
 			process.resourcesPath,
 			"app.asar.unpacked/resources/tray",
 		);
-		const buildIcons = join(process.resourcesPath, "app.asar/resources/build/icons");
+		const buildIcons = join(
+			process.resourcesPath,
+			"app.asar/resources/build/icons",
+		);
 		for (const name of candidates) {
 			const p = join(trayBase, name);
 			if (existsSync(p)) return p;

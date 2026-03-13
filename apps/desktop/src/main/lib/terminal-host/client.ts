@@ -28,6 +28,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { app } from "electron";
 import { SUPERSET_DIR_NAME } from "shared/constants";
+import { getTerminalHostEndpoint, usesFilesystemSocket } from "./endpoint";
 import {
 	type ClearScrollbackRequest,
 	type CreateOrAttachRequest,
@@ -49,7 +50,6 @@ import {
 	type TerminalExitEvent,
 	type WriteRequest,
 } from "./types";
-import { getTerminalHostEndpoint, usesFilesystemSocket } from "./endpoint";
 
 // =============================================================================
 // Connection State
@@ -176,13 +176,13 @@ export class TerminalHostClient extends EventEmitter {
 	constructor() {
 		super();
 		if (DEBUG_CLIENT) {
-				console.log("[TerminalHostClient] Initialized with paths:", {
-					SUPERSET_DIR_NAME,
-					SUPERSET_HOME_DIR,
-					SOCKET_ENDPOINT,
-					USE_FILESYSTEM_SOCKET,
-					NODE_ENV: process.env.NODE_ENV,
-				});
+			console.log("[TerminalHostClient] Initialized with paths:", {
+				SUPERSET_DIR_NAME,
+				SUPERSET_HOME_DIR,
+				SOCKET_ENDPOINT,
+				USE_FILESYSTEM_SOCKET,
+				NODE_ENV: process.env.NODE_ENV,
+			});
 		}
 	}
 

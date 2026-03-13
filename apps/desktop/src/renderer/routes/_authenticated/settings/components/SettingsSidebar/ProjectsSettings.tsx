@@ -109,9 +109,7 @@ export function ProjectsSettings({ searchQuery }: ProjectsSettingsProps) {
 														: "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground",
 												)}
 											>
-												<span className="flex-1 truncate">
-													{tt("Cloud")}
-												</span>
+												<span className="flex-1 truncate">{tt("Cloud")}</span>
 												<HiChevronRight className="h-3 w-3 text-muted-foreground group-data-[state=open]:hidden" />
 												<HiChevronDown className="h-3 w-3 text-muted-foreground group-data-[state=closed]:hidden" />
 											</CollapsibleTrigger>

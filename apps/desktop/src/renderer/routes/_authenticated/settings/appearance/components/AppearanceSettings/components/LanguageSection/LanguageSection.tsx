@@ -19,7 +19,9 @@ export function LanguageSection() {
 
 	return (
 		<div>
-			<h3 className="text-sm font-medium mb-2">{t("settings.language.title")}</h3>
+			<h3 className="text-sm font-medium mb-2">
+				{t("settings.language.title")}
+			</h3>
 			<p className="text-sm text-muted-foreground mb-4">
 				{t("settings.language.description")}
 			</p>

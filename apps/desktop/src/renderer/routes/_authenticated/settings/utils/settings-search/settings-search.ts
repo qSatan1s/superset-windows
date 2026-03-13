@@ -1,9 +1,9 @@
-import type { SettingsSection } from "renderer/stores/settings-state";
 import { translateText } from "renderer/lib/i18n";
 import {
-	getCurrentLanguage,
 	type AppLanguage,
+	getCurrentLanguage,
 } from "renderer/stores/language-state";
+import type { SettingsSection } from "renderer/stores/settings-state";
 
 export const SETTING_ITEM_ID = {
 	ACCOUNT_PROFILE: "account-profile",
@@ -926,7 +926,10 @@ type SearchIndexItem = {
 
 const SEARCH_INDEX_CACHE = new Map<AppLanguage, SearchIndexItem[]>();
 
-function buildSearchTokens(item: SettingsItem, language: AppLanguage): string[] {
+function buildSearchTokens(
+	item: SettingsItem,
+	language: AppLanguage,
+): string[] {
 	const localizedTitle = translateText(language, item.title);
 	const localizedDescription = translateText(language, item.description);
 
@@ -1005,7 +1008,9 @@ export function getMatchingItemsForSection(
 	section: SettingsSection,
 	language?: AppLanguage,
 ): SettingsItem[] {
-	return searchSettings(query, language).filter((item) => item.section === section);
+	return searchSettings(query, language).filter(
+		(item) => item.section === section,
+	);
 }
 
 export function isItemVisible(

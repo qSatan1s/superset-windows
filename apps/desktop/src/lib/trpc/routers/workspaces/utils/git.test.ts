@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 // Skip Unix-specific tests on Windows
 const isWindows = process.platform === "win32";
 const testUnix = isWindows ? test.skip : test;
+
 import { execSync } from "node:child_process";
 import {
 	existsSync,
@@ -286,26 +287,29 @@ describe("Shell Environment", () => {
 	});
 
 	// Skip on Windows - homebrew/linuxbrew are macOS/Linux only
-	testUnix("getShellEnvironment PATH includes homebrew and user-installed tools", async () => {
-		const { clearShellEnvCache, getShellEnvironment } = await import(
-			"./shell-env"
-		);
-		clearShellEnvCache();
+	testUnix(
+		"getShellEnvironment PATH includes homebrew and user-installed tools",
+		async () => {
+			const { clearShellEnvCache, getShellEnvironment } = await import(
+				"./shell-env"
+			);
+			clearShellEnvCache();
 
-		const env = await getShellEnvironment();
-		const shellPath = env.PATH || env.Path || "";
+			const env = await getShellEnvironment();
+			const shellPath = env.PATH || env.Path || "";
 
-		// The derived PATH should be richer than the minimal macOS GUI PATH
-		// (/usr/bin:/bin:/usr/sbin:/sbin). It should include at least one of
-		// these common user-installed tool directories.
-		const userPaths = [
-			"/opt/homebrew/bin",
-			"/usr/local/bin",
-			"/home/linuxbrew/.linuxbrew/bin",
-		];
-		const hasUserPath = userPaths.some((p) => shellPath.includes(p));
-		expect(hasUserPath).toBe(true);
-	});
+			// The derived PATH should be richer than the minimal macOS GUI PATH
+			// (/usr/bin:/bin:/usr/sbin:/sbin). It should include at least one of
+			// these common user-installed tool directories.
+			const userPaths = [
+				"/opt/homebrew/bin",
+				"/usr/local/bin",
+				"/home/linuxbrew/.linuxbrew/bin",
+			];
+			const hasUserPath = userPaths.some((p) => shellPath.includes(p));
+			expect(hasUserPath).toBe(true);
+		},
+	);
 
 	test("getShellEnvironment strips delimiter noise from interactive shell output", async () => {
 		const { clearShellEnvCache, getShellEnvironment } = await import(
@@ -399,33 +403,36 @@ describe("createWorktree hook tolerance", () => {
 	});
 
 	// Skip on Windows - uses chmod which doesn't work on Windows
-	testUnix("continues when post-checkout hook fails but worktree is created", async () => {
-		const repoPath = createTestRepo("worktree-hook-failure");
-		seedCommit(repoPath);
+	testUnix(
+		"continues when post-checkout hook fails but worktree is created",
+		async () => {
+			const repoPath = createTestRepo("worktree-hook-failure");
+			seedCommit(repoPath);
 
-		const hookPath = join(repoPath, ".git", "hooks", "post-checkout");
-		writeFileSync(
-			hookPath,
-			"#!/bin/sh\necho 'post-checkout failed' >&2\nexit 1\n",
-		);
-		execSync(`chmod +x "${hookPath}"`);
+			const hookPath = join(repoPath, ".git", "hooks", "post-checkout");
+			writeFileSync(
+				hookPath,
+				"#!/bin/sh\necho 'post-checkout failed' >&2\nexit 1\n",
+			);
+			execSync(`chmod +x "${hookPath}"`);
 
-		const worktreePath = join(TEST_DIR, "worktree-hook-failure-wt");
-		await createWorktree(
-			repoPath,
-			"feature/hook-failure",
-			worktreePath,
-			"HEAD",
-		);
+			const worktreePath = join(TEST_DIR, "worktree-hook-failure-wt");
+			await createWorktree(
+				repoPath,
+				"feature/hook-failure",
+				worktreePath,
+				"HEAD",
+			);
 
-		expect(existsSync(worktreePath)).toBe(true);
-		const currentBranch = execSync("git rev-parse --abbrev-ref HEAD", {
-			cwd: worktreePath,
-		})
-			.toString()
-			.trim();
-		expect(currentBranch).toBe("feature/hook-failure");
-	});
+			expect(existsSync(worktreePath)).toBe(true);
+			const currentBranch = execSync("git rev-parse --abbrev-ref HEAD", {
+				cwd: worktreePath,
+			})
+				.toString()
+				.trim();
+			expect(currentBranch).toBe("feature/hook-failure");
+		},
+	);
 
 	test("throws when destination path exists but worktree is not created", async () => {
 		const repoPath = createTestRepo("worktree-existing-path");

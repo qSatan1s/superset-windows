@@ -7,8 +7,8 @@ import {
 } from "@superset/ui/dialog";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { useOpenProject } from "renderer/react-query/projects";
 import { useI18n } from "renderer/lib/i18n";
+import { useOpenProject } from "renderer/react-query/projects";
 import {
 	useCloseNewWorkspaceModal,
 	useNewWorkspaceModalOpen,
@@ -50,9 +50,7 @@ export function NewWorkspaceModal() {
 				<DialogHeader className="sr-only">
 					<DialogTitle>{tt("New Workspace")}</DialogTitle>
 					<DialogDescription>
-						{tt(
-							"Create a new workspace from a PR, branch, issue, or prompt.",
-						)}
+						{tt("Create a new workspace from a PR, branch, issue, or prompt.")}
 					</DialogDescription>
 				</DialogHeader>
 				<DialogContent

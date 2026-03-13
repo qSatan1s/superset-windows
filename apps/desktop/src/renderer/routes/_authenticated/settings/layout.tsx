@@ -5,7 +5,6 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	type SettingsSection,
 	useSettingsSearchQuery,

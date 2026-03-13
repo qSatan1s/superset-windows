@@ -1,26 +1,14 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { settings } from "@superset/local-db";
-import {
-	app,
-	BrowserWindow,
-	dialog,
-	Notification,
-	net,
-	protocol,
-	session,
-} from "electron";
+import { app, BrowserWindow, dialog, net, protocol, session } from "electron";
 import { makeAppSetup } from "lib/electron-app/factories/app/setup";
 import {
 	handleAuthCallback,
 	parseAuthDeepLink,
 } from "lib/trpc/routers/auth/utils/auth-functions";
 import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
-import {
-	DEFAULT_CONFIRM_ON_QUIT,
-	PLATFORM,
-	PROTOCOL_SCHEME,
-} from "shared/constants";
+import { DEFAULT_CONFIRM_ON_QUIT, PROTOCOL_SCHEME } from "shared/constants";
 import { setupAgentHooks } from "./lib/agent-setup";
 import { initAppState } from "./lib/app-state";
 import { setupAutoUpdater } from "./lib/auto-updater";
@@ -105,8 +93,6 @@ function focusMainWindow(): void {
 		mainWindow.focus();
 	}
 }
-
-
 
 // macOS open-url can fire before the window exists (cold-start via protocol link).
 // Queue the URL and process it after initialization.

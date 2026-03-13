@@ -16,7 +16,6 @@ import {
 	useOpenExternalWorktree,
 } from "renderer/react-query/workspaces";
 import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import { useHotkeysStore } from "renderer/stores/hotkeys/store";
 import { useNewWorkspaceModalDraft } from "../../NewWorkspaceModalDraftContext";
 import { resolveBranchAction } from "./resolveBranchAction";
 
@@ -80,7 +79,10 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 	}, [allWorkspaces, projectId]);
 
 	const trackedWorktreeByBranch = useMemo(() => {
-		const map = new Map<string, { worktreeId: string; existsOnDisk: boolean }>();
+		const map = new Map<
+			string,
+			{ worktreeId: string; existsOnDisk: boolean }
+		>();
 		for (const worktree of trackedWorktrees) {
 			if (worktree.hasActiveWorkspace) continue;
 			map.set(worktree.branch, {
@@ -242,7 +244,9 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 				loading: tt("Importing worktree..."),
 				success: tt("Imported {branch}", { branch: branchName }),
 				error: (error) =>
-					error instanceof Error ? error.message : tt("Failed to import worktree"),
+					error instanceof Error
+						? error.message
+						: tt("Failed to import worktree"),
 			});
 		},
 		[openTrackedWorktree, runAsyncAction, tt],
@@ -261,7 +265,9 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 					loading: tt("Importing worktree..."),
 					success: tt("Imported {branch}", { branch: branchName }),
 					error: (error) =>
-						error instanceof Error ? error.message : tt("Failed to import worktree"),
+						error instanceof Error
+							? error.message
+							: tt("Failed to import worktree"),
 				},
 			);
 		},
@@ -317,7 +323,9 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 			);
 		} catch (error) {
 			toast.error(
-				error instanceof Error ? error.message : tt("Failed to import worktrees"),
+				error instanceof Error
+					? error.message
+					: tt("Failed to import worktrees"),
 			);
 		}
 	}, [importAllWorktrees, projectId, tt]);

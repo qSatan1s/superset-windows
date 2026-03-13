@@ -6,11 +6,11 @@ import {
 	HiMagnifyingGlass,
 	HiXMark,
 } from "react-icons/hi2";
+import { useI18n } from "renderer/lib/i18n";
 import {
 	useSetSettingsSearchQuery,
 	useSettingsSearchQuery,
 } from "renderer/stores/settings-state";
-import { useI18n } from "renderer/lib/i18n";
 import { getMatchCountBySection } from "../../utils/settings-search";
 import { GeneralSettings } from "./GeneralSettings";
 import { ProjectsSettings } from "./ProjectsSettings";

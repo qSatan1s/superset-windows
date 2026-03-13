@@ -13,12 +13,12 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LuHistory } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { useI18n } from "renderer/lib/i18n";
 import {
 	StatusIcon,
 	type StatusType,
 } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/components/shared/StatusIcon";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { useI18n } from "renderer/lib/i18n";
 import {
 	type RecentlyViewedEntry,
 	useRecentlyViewed,

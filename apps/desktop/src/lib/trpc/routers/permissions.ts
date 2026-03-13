@@ -1,7 +1,4 @@
-import fs from "node:fs";
-import { homedir } from "node:os";
-import path from "node:path";
-import { shell, systemPreferences } from "electron";
+import { systemPreferences } from "electron";
 import { publicProcedure, router } from "..";
 
 function checkFullDiskAccess(): boolean {

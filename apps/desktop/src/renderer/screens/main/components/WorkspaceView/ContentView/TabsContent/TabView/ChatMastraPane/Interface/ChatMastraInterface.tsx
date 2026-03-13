@@ -24,9 +24,9 @@ import type {
 	ModelOption,
 	PermissionMode,
 } from "../../ChatPane/ChatInterface/types";
+import { McpControls } from "./components/McpControls";
 import { ChatMastraMessageList } from "./components/MsgList";
 import type { UserMessageRestartRequest } from "./components/MsgList/ChatMastraMessageList.types";
-import { McpControls } from "./components/McpControls";
 import { useMcpUi } from "./hooks/useMcpUi";
 import { useOptimisticUpload } from "./hooks/useOptimisticUpload";
 import type { ChatMastraInterfaceProps } from "./types";

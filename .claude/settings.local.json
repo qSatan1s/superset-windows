@@ -19,7 +19,21 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(bun test:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git tag:*)",
+      "Bash(node -e:*)",
+      "Bash(bun run lint:fix:*)",
+      "Bash(git reset:*)",
+      "Bash(bun run:*)",
+      "Bash(NODE_ENV=development bun run:*)",
+      "Bash(bunx @biomejs/biome@2.4.2 check .claude/settings.local.json apps/desktop/scripts/copy-native-modules.ts scripts/postinstall.ts apps/desktop/src/lib/trpc/routers/permissions.ts)",
+      "Bash(bunx @biomejs/biome@2.4.2 format --write .claude/settings.local.json)",
+      "Bash(bunx @biomejs/biome@2.4.2 check apps/desktop/scripts/copy-native-modules.ts scripts/postinstall.ts apps/desktop/src/lib/trpc/routers/permissions.ts apps/desktop/package.json .claude/settings.local.json)",
+      "Bash(bunx @biomejs/biome@2.4.2 check apps/desktop/scripts/copy-native-modules.ts scripts/postinstall.ts apps/desktop/src/lib/trpc/routers/permissions.ts apps/desktop/package.json)",
+      "Read(//c/Users/Luffi/Desktop/trip-rift/superset-windows/.git/worktrees/epic-snyder/**)",
+      "Bash(rm -f \"C:/Users/Luffi/Desktop/trip-rift/superset-windows/.git/worktrees/epic-snyder/index.lock\")",
+      "Read(//c/Users/Luffi/Desktop/trip-rift/superset-windows/.git/**)",
+      "Bash(rm -f \"C:/Users/Luffi/Desktop/trip-rift/superset-windows/.git/index.lock\")"
     ]
   },
   "enabledMcpjsonServers": [

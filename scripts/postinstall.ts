@@ -29,6 +29,9 @@ try {
 		cwd: root,
 	});
 } catch (err) {
-	console.warn("[postinstall] install:deps failed (may need Visual Studio Build Tools on Windows):", err);
+	console.warn(
+		"[postinstall] install:deps failed (may need Visual Studio Build Tools on Windows):",
+		err,
+	);
 	// Non-fatal - user can run manually
 }

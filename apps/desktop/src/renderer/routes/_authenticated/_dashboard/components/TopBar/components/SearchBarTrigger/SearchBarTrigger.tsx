@@ -1,8 +1,8 @@
 import { Kbd, KbdGroup } from "@superset/ui/kbd";
 import { useCallback } from "react";
 import { LuSearch } from "react-icons/lu";
-import { getHotkeyKeys, useHotkeyDisplay } from "renderer/stores/hotkeys";
 import { useI18n } from "renderer/lib/i18n";
+import { getHotkeyKeys, useHotkeyDisplay } from "renderer/stores/hotkeys";
 
 interface SearchBarTriggerProps {
 	workspaceName?: string;

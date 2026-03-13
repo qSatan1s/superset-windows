@@ -174,7 +174,9 @@ export function PullRequestsGroup({
 	if (!projectId) {
 		return (
 			<CommandGroup>
-				<CommandEmpty>{tt("Select a project to view pull requests.")}</CommandEmpty>
+				<CommandEmpty>
+					{tt("Select a project to view pull requests.")}
+				</CommandEmpty>
 			</CommandGroup>
 		);
 	}

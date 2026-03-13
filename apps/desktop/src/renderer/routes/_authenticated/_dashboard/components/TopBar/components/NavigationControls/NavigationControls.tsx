@@ -3,8 +3,8 @@ import { useLocation, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { HotkeyTooltipContent } from "renderer/components/HotkeyTooltipContent";
-import { useAppHotkey } from "renderer/stores/hotkeys";
 import { useI18n } from "renderer/lib/i18n";
+import { useAppHotkey } from "renderer/stores/hotkeys";
 import { HistoryDropdown } from "./components/HistoryDropdown";
 
 export function NavigationControls() {
@@ -47,7 +47,10 @@ export function NavigationControls() {
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
-					<HotkeyTooltipContent label={tt("Go back")} hotkeyId="NAVIGATE_BACK" />
+					<HotkeyTooltipContent
+						label={tt("Go back")}
+						hotkeyId="NAVIGATE_BACK"
+					/>
 				</TooltipContent>
 			</Tooltip>
 

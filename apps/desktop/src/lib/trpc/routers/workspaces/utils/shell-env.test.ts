@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 // Skip zsh-specific tests on Windows
 const isWindows = process.platform === "win32";
 const describeUnix = isWindows ? describe.skip : describe;
+
 import {
 	existsSync,
 	mkdtempSync,

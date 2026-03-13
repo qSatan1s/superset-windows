@@ -128,7 +128,15 @@ async function fetchNpmPackageAsync(
 		const res = await fetch(url);
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const buf = await res.arrayBuffer();
-		const archive = new (globalThis as unknown as { Bun: { Archive: new (d: ArrayBuffer) => { extract: (p: string) => Promise<number> } } }).Bun.Archive(buf);
+		const archive = new (
+			globalThis as unknown as {
+				Bun: {
+					Archive: new (
+						d: ArrayBuffer,
+					) => { extract: (p: string) => Promise<number> };
+				};
+			}
+		).Bun.Archive(buf);
 		const tmpDir = join(dirname(destPath), `._tmp_${barePackageName}`);
 		mkdirSync(tmpDir, { recursive: true });
 		await archive.extract(tmpDir);
@@ -249,9 +257,7 @@ async function copyAstGrepPlatformPackages(
 	}
 }
 
-async function copyLibsqlDependencies(
-	nodeModulesDir: string,
-): Promise<void> {
+async function copyLibsqlDependencies(nodeModulesDir: string): Promise<void> {
 	const libsqlPath = join(nodeModulesDir, "libsql");
 	const libsqlPkgJsonPath = join(libsqlPath, "package.json");
 	if (!existsSync(libsqlPkgJsonPath)) return;

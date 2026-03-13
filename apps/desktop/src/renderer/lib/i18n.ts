@@ -1,4 +1,4 @@
-import { useLanguage, type AppLanguage } from "renderer/stores/language-state";
+import { type AppLanguage, useLanguage } from "renderer/stores/language-state";
 
 const TRANSLATIONS = {
 	en: {
@@ -109,8 +109,7 @@ const STATIC_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 		"Sign Out": "Выйти",
 		"Sign out of your Superset account on this device.":
 			"Выйти из аккаунта Superset на этом устройстве.",
-		"Configure general app preferences":
-			"Настройте общие параметры приложения",
+		"Configure general app preferences": "Настройте общие параметры приложения",
 		"Confirm before quitting": "Подтверждать выход",
 		"Show a confirmation dialog when quitting the app":
 			"Показывать диалог подтверждения при выходе из приложения",
@@ -125,7 +124,8 @@ const STATIC_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 		"Open links in app browser": "Открывать ссылки во встроенном браузере",
 		"Open links from chat and terminal in the built-in browser instead of your default browser":
 			"Открывать ссылки из чата и терминала во встроенном браузере вместо браузера по умолчанию",
-		"Send anonymous usage data": "Отправлять анонимную статистику использования",
+		"Send anonymous usage data":
+			"Отправлять анонимную статистику использования",
 		"Help improve Superset by sending anonymous usage data":
 			"Помогите улучшить Superset, отправляя анонимную статистику использования",
 		"Configure git branch and worktree behavior":
@@ -148,7 +148,8 @@ const STATIC_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 		"Choose the notification sound for completed tasks":
 			"Выберите звук уведомления для завершённых задач",
 		"Notification sounds": "Звуки уведомлений",
-		"Play a sound when tasks complete": "Воспроизводить звук при завершении задач",
+		"Play a sound when tasks complete":
+			"Воспроизводить звук при завершении задач",
 		"Notification Sound": "Звук уведомления",
 		"Replace Custom Audio": "Заменить свой аудиофайл",
 		"Add Custom Audio": "Добавить свой аудиофайл",
@@ -166,10 +167,10 @@ const STATIC_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 		"Imported {branch}": "Импортировано: {branch}",
 		"Failed to import worktree": "Не удалось импортировать worktree",
 		"Imported 1 workspace": "Импортировано 1 рабочее пространство",
-		"Imported {count} workspaces":
-			"Импортировано рабочих пространств: {count}",
+		"Imported {count} workspaces": "Импортировано рабочих пространств: {count}",
 		"Failed to import worktrees": "Не удалось импортировать worktree",
-		"Select a project to view branches.": "Выберите проект для просмотра веток.",
+		"Select a project to view branches.":
+			"Выберите проект для просмотра веток.",
 		"Loading branches...": "Загрузка веток...",
 		All: "Все",
 		Worktrees: "Worktree",
@@ -219,7 +220,8 @@ const STATIC_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 		"Path copied to clipboard": "Путь скопирован в буфер обмена",
 		"Failed to copy path:": "Не удалось скопировать путь:",
 		"No default editor configured": "Редактор по умолчанию не настроен",
-		"Open a project in an editor first to set a default.": "Сначала откройте проект в редакторе, чтобы установить его по умолчанию.",
+		"Open a project in an editor first to set a default.":
+			"Сначала откройте проект в редакторе, чтобы установить его по умолчанию.",
 		"Open in {app}": "Открыть в {app}",
 		"Open in editor": "Открыть в редакторе",
 		"Select an editor from the dropdown": "Выберите редактор из списка",

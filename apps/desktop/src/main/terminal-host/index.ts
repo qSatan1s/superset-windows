@@ -26,6 +26,10 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { SUPERSET_DIR_NAME } from "shared/constants";
 import {
+	getTerminalHostEndpoint,
+	usesFilesystemSocket,
+} from "../lib/terminal-host/endpoint";
+import {
 	type ClearScrollbackRequest,
 	type CreateOrAttachRequest,
 	type DetachRequest,
@@ -45,10 +49,6 @@ import {
 	type TerminalExitEvent,
 	type WriteRequest,
 } from "../lib/terminal-host/types";
-import {
-	getTerminalHostEndpoint,
-	usesFilesystemSocket,
-} from "../lib/terminal-host/endpoint";
 import { setupTerminalHostSignalHandlers } from "./signal-handlers";
 import { TerminalHost } from "./terminal-host";
 

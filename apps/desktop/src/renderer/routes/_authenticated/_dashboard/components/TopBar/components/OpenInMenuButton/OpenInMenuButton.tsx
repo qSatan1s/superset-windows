@@ -48,7 +48,8 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 	});
 	const copyPath = electronTrpc.external.copyPath.useMutation({
 		onSuccess: () => toast.success(tt("Path copied to clipboard")),
-		onError: (error) => toast.error(`${tt("Failed to copy path:")} ${error.message}`),
+		onError: (error) =>
+			toast.error(`${tt("Failed to copy path:")} ${error.message}`),
 	});
 
 	const currentApp = useMemo(
@@ -72,7 +73,7 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 			return;
 		}
 		openInApp.mutate({ path: worktreePath, app: defaultApp, projectId });
-	}, [worktreePath, defaultApp, projectId, openInApp, copyPath.isPending]);
+	}, [worktreePath, defaultApp, projectId, openInApp, copyPath.isPending, tt]);
 
 	const handleOpenInOtherApp = useCallback(
 		(appId: ExternalApp) => {
@@ -98,7 +99,9 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 						disabled={isLoading || !currentApp}
 						aria-label={
 							currentApp
-								? tt("Open in {app}", { app: currentApp.displayLabel ?? currentApp.label })
+								? tt("Open in {app}", {
+										app: currentApp.displayLabel ?? currentApp.label,
+									})
 								: tt("Open in editor")
 						}
 						className={cn(
@@ -134,7 +137,9 @@ export const OpenInMenuButton = memo(function OpenInMenuButton({
 					<div className="flex flex-col gap-1">
 						<span className="flex items-center gap-1.5">
 							{currentApp
-								? tt("Open in {app}", { app: currentApp.displayLabel ?? currentApp.label })
+								? tt("Open in {app}", {
+										app: currentApp.displayLabel ?? currentApp.label,
+									})
 								: tt("Select an editor from the dropdown")}
 							{currentApp && showOpenInShortcut && (
 								<kbd className="px-1 py-0.5 text-[10px] font-mono bg-foreground/10 text-foreground/70 rounded">

@@ -16,7 +16,6 @@ import {
 	LuScissors,
 	LuSearch,
 } from "react-icons/lu";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	type PaneContextMenuActions,
 	PaneContextMenuItems,

@@ -11,10 +11,10 @@ import type { SplitPaneOptions, Tab } from "renderer/stores/tabs/types";
 import { TabContentContextMenu } from "../../TabContentContextMenu";
 import { createChatServiceIpcClient } from "../ChatPane/utils/chat-service-client";
 import { BasePaneWindow, PaneToolbarActions } from "../components";
-import { ChatMastraInterface } from "./Interface";
 import { SessionSelector } from "./components/SessionSelector";
 import { useChatMastraPaneController } from "./hooks/useChatMastraPaneController";
 import { useChatMastraRawSnapshot } from "./hooks/useChatMastraRawSnapshot";
+import { ChatMastraInterface } from "./Interface";
 import { createChatMastraServiceIpcClient } from "./utils/chat-mastra-service-client";
 
 const mastraIpcClient = createChatMastraServiceIpcClient();

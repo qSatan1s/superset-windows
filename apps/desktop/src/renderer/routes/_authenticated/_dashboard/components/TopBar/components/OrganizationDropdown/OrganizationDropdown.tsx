@@ -29,9 +29,9 @@ import { IoBugOutline } from "react-icons/io5";
 import { LuKeyboard } from "react-icons/lu";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { useI18n } from "renderer/lib/i18n";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHotkeyText } from "renderer/stores/hotkeys";
-import { useI18n } from "renderer/lib/i18n";
 
 export function OrganizationDropdown() {
 	const { data: session } = authClient.useSession();
@@ -65,7 +65,8 @@ export function OrganizationDropdown() {
 	}
 
 	const userName = session?.user?.name;
-	const displayName = activeOrganization?.name ?? userName ?? tt("Organization");
+	const displayName =
+		activeOrganization?.name ?? userName ?? tt("Organization");
 
 	return (
 		<DropdownMenu>
@@ -176,7 +177,8 @@ export function OrganizationDropdown() {
 							{tt("Discord")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => openExternal(COMPANY.X_URL)}>
-							<FaXTwitter className="h-4 w-4" />{tt("X")}
+							<FaXTwitter className="h-4 w-4" />
+							{tt("X")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => openExternal(COMPANY.MAIL_TO)}>
 							<HiOutlineEnvelope className="h-4 w-4" />

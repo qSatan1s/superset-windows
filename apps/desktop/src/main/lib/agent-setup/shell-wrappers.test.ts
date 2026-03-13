@@ -1,8 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 
 // Skip all tests on Windows - these test Unix shell wrappers
 const isWindows = process.platform === "win32";
 const describeUnix = isWindows ? describe.skip : describe;
+
 import { execFileSync } from "node:child_process";
 import {
 	chmodSync,

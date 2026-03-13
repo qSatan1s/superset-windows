@@ -160,9 +160,7 @@ export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 	return (
 		<>
 			{SECTION_GROUPS.map((group, groupIndex) => {
-				const platformItems = group.items.filter(
-					(item) => !item.macOnly,
-				);
+				const platformItems = group.items.filter((item) => !item.macOnly);
 				const filteredItems = matchCounts
 					? platformItems.filter((item) => (matchCounts[item.section] ?? 0) > 0)
 					: platformItems;

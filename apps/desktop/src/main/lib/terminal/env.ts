@@ -6,7 +6,7 @@ import defaultShell from "default-shell";
 import { env } from "shared/env.shared";
 import { getShellEnv } from "../agent-setup/shell-wrappers";
 
-const MACOS_SYSTEM_CERT_FILE = "/etc/ssl/cert.pem";
+const _MACOS_SYSTEM_CERT_FILE = "/etc/ssl/cert.pem";
 let cachedUtf8Locale: string | null = null;
 let localeProbeInFlight = false;
 
@@ -79,7 +79,8 @@ function getWindowsDefaultShell(): string {
 	}
 
 	const programFiles = process.env.ProgramFiles || "C:\\Program Files";
-	const programFilesX86 = process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)";
+	const programFilesX86 =
+		process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)";
 	const localAppData = process.env.LOCALAPPDATA;
 
 	const candidates: string[] = [
@@ -87,7 +88,9 @@ function getWindowsDefaultShell(): string {
 		path.join(programFilesX86, "Git", "bin", "bash.exe"),
 	];
 	if (localAppData) {
-		candidates.unshift(path.join(localAppData, "Programs", "Git", "bin", "bash.exe"));
+		candidates.unshift(
+			path.join(localAppData, "Programs", "Git", "bin", "bash.exe"),
+		);
 	}
 
 	for (const candidate of candidates) {
@@ -476,8 +479,6 @@ export function buildTerminalEnv(params: {
 	};
 
 	delete terminalEnv.GOOGLE_API_KEY;
-
-
 
 	return terminalEnv;
 }

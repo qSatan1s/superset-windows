@@ -18,8 +18,8 @@ const SHELL_ENV_TIMEOUT_MS = 8_000;
 let fallbackCacheTtlMs = FALLBACK_CACHE_TTL_MS;
 
 // Track PATH fix state for macOS GUI app PATH fix
-let pathFixAttempted = false;
-let pathFixSucceeded = false;
+let _pathFixAttempted = false;
+let _pathFixSucceeded = false;
 
 class ShellEnvTimeoutError extends Error {
 	constructor(timeoutMs: number) {
@@ -103,8 +103,8 @@ export function clearShellEnvCache(): void {
 	cacheTime = 0;
 	isFallbackCache = false;
 	fallbackCacheTtlMs = FALLBACK_CACHE_TTL_MS;
-	pathFixAttempted = false;
-	pathFixSucceeded = false;
+	_pathFixAttempted = false;
+	_pathFixSucceeded = false;
 }
 
 function copyStringEnv(
@@ -184,16 +184,11 @@ export async function execWithShellEnv(
 	const baseEnv = options?.env
 		? { ...process.env, ...options.env }
 		: process.env;
-
-	try {
-		return await execFileAsync(cmd, args, {
-			...options,
-			encoding: "utf8",
-			env: await getProcessEnvWithShellEnv(baseEnv),
-		});
-	} catch (error) {
-		throw error;
-	}
+	return await execFileAsync(cmd, args, {
+		...options,
+		encoding: "utf8",
+		env: await getProcessEnvWithShellEnv(baseEnv),
+	});
 }
 
 /**

@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 // Skip all tests on Windows - these test Unix shell commands
 const isWindows = process.platform === "win32";
 const describeUnix = isWindows ? describe.skip : describe;
+
 import {
 	chmodSync,
 	existsSync,
