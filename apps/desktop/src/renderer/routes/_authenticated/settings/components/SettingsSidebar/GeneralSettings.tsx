@@ -14,7 +14,6 @@ import {
 	HiOutlineUser,
 } from "react-icons/hi2";
 import { LuGitBranch, LuKeyboard } from "react-icons/lu";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useI18n } from "renderer/lib/i18n";
 import type { SettingsSection } from "renderer/stores/settings-state";
 
@@ -154,7 +153,6 @@ const SECTION_GROUPS: SectionGroup[] = [
 
 export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 	const matchRoute = useMatchRoute();
-	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const { tt } = useI18n();
 
 	return (
