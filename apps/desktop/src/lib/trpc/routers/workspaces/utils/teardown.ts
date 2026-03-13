@@ -43,7 +43,9 @@ export async function runTeardown({
 
 	try {
 		const shell =
-			process.env.SHELL || "/bin/bash";
+			process.platform === "win32"
+				? process.env.COMSPEC || "cmd.exe"
+				: process.env.SHELL || "/bin/bash";
 		const supersetHomeDir =
 			process.env.SUPERSET_HOME_DIR || join(homedir(), SUPERSET_DIR_NAME);
 		const shellWrapperPaths = {

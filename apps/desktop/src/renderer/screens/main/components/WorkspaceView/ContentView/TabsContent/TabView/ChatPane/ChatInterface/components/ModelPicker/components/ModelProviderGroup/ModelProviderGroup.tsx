@@ -11,8 +11,8 @@ import {
 	OPENAI_LOGO_PROVIDER,
 	providerToLogo,
 } from "../../utils/providerToLogo";
-import { AnthropicProviderHeading } from "./components/AnthropicProviderHeading";
-import { OpenAIProviderHeading } from "./components/OpenAIProviderHeading";
+import { AnthropicProviderHeading } from "./AnthropicHeading";
+import { OpenAIProviderHeading } from "./OpenAIHeading";
 
 interface ModelProviderGroupProps {
 	provider: string;

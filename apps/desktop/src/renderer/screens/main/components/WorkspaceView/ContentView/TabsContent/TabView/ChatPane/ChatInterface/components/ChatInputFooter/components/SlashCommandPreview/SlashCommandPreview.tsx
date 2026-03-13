@@ -1,7 +1,7 @@
 import { chatServiceTrpc } from "@superset/chat/client";
 import { usePromptInputController } from "@superset/ui/ai-elements/prompt-input";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { SlashCommandParamField } from "./components/SlashCommandParamField";
+import { SlashCommandParamField } from "./ParamField";
 import {
 	buildNextSlashInput,
 	buildParamFields,

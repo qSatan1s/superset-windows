@@ -137,6 +137,9 @@ function escapeFishDoubleQuoted(value: string): string {
 export function createZshWrapper(
 	paths: ShellWrapperPaths = DEFAULT_PATHS,
 ): void {
+	// Zsh wrapper is not needed on Windows
+	if (process.platform === "win32") return;
+
 	logModeDiagnostics("zsh");
 	const quotedZshDir = quoteShellLiteral(paths.ZSH_DIR);
 
@@ -203,6 +206,9 @@ export ZDOTDIR="$_superset_home"
 export function createBashWrapper(
 	paths: ShellWrapperPaths = DEFAULT_PATHS,
 ): void {
+	// Bash wrapper is not needed on Windows
+	if (process.platform === "win32") return;
+
 	logModeDiagnostics("bash");
 
 	const rcfilePath = path.join(paths.BASH_DIR, "rcfile");

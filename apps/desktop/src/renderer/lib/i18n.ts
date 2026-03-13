@@ -252,7 +252,6 @@ const STATIC_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 		"Mark as Unread": "Отметить как непрочитанное",
 		"Close Pane": "Закрыть панель",
 		"Failed to open: ": "Не удалось открыть: ",
-		Organization: "Организация",
 	},
 };
 

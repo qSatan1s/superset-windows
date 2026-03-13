@@ -1,6 +1,6 @@
 import { toast } from "@superset/ui/sonner";
 import { useCallback, useRef, useState } from "react";
-import type { ChatMastraRawSnapshot } from "../../ChatMastraInterface/types";
+import type { ChatMastraRawSnapshot } from "../../Interface/types";
 
 interface UseChatMastraRawSnapshotOptions {
 	sessionId: string | null;

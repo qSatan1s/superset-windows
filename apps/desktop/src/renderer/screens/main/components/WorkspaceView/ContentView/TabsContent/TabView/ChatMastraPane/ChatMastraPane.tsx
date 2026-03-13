@@ -11,7 +11,7 @@ import type { SplitPaneOptions, Tab } from "renderer/stores/tabs/types";
 import { TabContentContextMenu } from "../../TabContentContextMenu";
 import { createChatServiceIpcClient } from "../ChatPane/utils/chat-service-client";
 import { BasePaneWindow, PaneToolbarActions } from "../components";
-import { ChatMastraInterface } from "./ChatMastraInterface";
+import { ChatMastraInterface } from "./Interface";
 import { SessionSelector } from "./components/SessionSelector";
 import { useChatMastraPaneController } from "./hooks/useChatMastraPaneController";
 import { useChatMastraRawSnapshot } from "./hooks/useChatMastraRawSnapshot";

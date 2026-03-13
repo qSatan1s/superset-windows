@@ -37,10 +37,17 @@ import {
 export function setupAgentHooks(): void {
 	console.log("[agent-setup] Initializing agent hooks...");
 
+	const isWindows = process.platform === "win32";
+
 	fs.mkdirSync(BIN_DIR, { recursive: true });
 	fs.mkdirSync(HOOKS_DIR, { recursive: true });
-	fs.mkdirSync(ZSH_DIR, { recursive: true });
-	fs.mkdirSync(BASH_DIR, { recursive: true });
+
+	// Unix shell directories are not needed on Windows
+	if (!isWindows) {
+		fs.mkdirSync(ZSH_DIR, { recursive: true });
+		fs.mkdirSync(BASH_DIR, { recursive: true });
+	}
+
 	fs.mkdirSync(OPENCODE_PLUGIN_DIR, { recursive: true });
 
 	cleanupGlobalOpenCodePlugin();
@@ -63,8 +70,11 @@ export function setupAgentHooks(): void {
 	createCopilotHookScript();
 	createCopilotWrapper();
 
-	createZshWrapper();
-	createBashWrapper();
+	// Unix shell wrappers are not needed on Windows
+	if (!isWindows) {
+		createZshWrapper();
+		createBashWrapper();
+	}
 
 	console.log("[agent-setup] Agent hooks initialized");
 }

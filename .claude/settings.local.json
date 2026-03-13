@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(while read -r file)",
+      "Bash(do len=$#file)",
+      "Bash(if [ $len -gt 200 ])",
+      "Bash(then echo \"$len $file\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(while read f)",
+      "Bash(do basename \"$f\")",
+      "Bash(bun run typecheck:*)",
+      "Bash(xargs sed:*)",
+      "Bash(bun run build:*)",
+      "Bash(dir:*)",
+      "Bash(git add:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "superset",
+    "expo-mcp",
+    "maestro",
+    "neon",
+    "linear",
+    "sentry",
+    "desktop-automation"
+  ]
+}
