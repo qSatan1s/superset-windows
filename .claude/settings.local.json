@@ -15,7 +15,10 @@
       "Bash(xargs sed:*)",
       "Bash(bun run build:*)",
       "Bash(dir:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(bun test:*)"
     ]
   },
   "enabledMcpjsonServers": [

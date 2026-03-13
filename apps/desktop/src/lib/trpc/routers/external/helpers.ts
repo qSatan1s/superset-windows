@@ -2,45 +2,6 @@ import { spawn } from "node:child_process";
 import nodePath from "node:path";
 import type { ExternalApp } from "@superset/local-db";
 
-/** Map of app IDs to their Linux CLI commands */
-const LINUX_CLI_COMMANDS: Record<ExternalApp, string | null> = {
-	finder: null, // Handled specially with shell.showItemInFolder
-	vscode: "code",
-	"vscode-insiders": "code-insiders",
-	cursor: "cursor",
-	antigravity: "antigravity",
-	windsurf: "windsurf",
-	zed: "zed",
-	xcode: null, // macOS only
-	iterm: null, // macOS only
-	warp: "warp-terminal",
-	terminal: null, // No universal Linux terminal command
-	ghostty: "ghostty",
-	sublime: "subl",
-	intellij: null, // Multi-edition, uses CLI candidates
-	webstorm: "webstorm",
-	pycharm: null, // Multi-edition, uses CLI candidates
-	phpstorm: "phpstorm",
-	rubymine: "rubymine",
-	goland: "goland",
-	clion: "clion",
-	rider: "rider",
-	datagrip: "datagrip",
-	appcode: null, // macOS only
-	fleet: "fleet",
-	rustrover: "rustrover",
-};
-
-/**
- * CLI command candidates for JetBrains IDEs with multiple editions on Linux.
- * JetBrains Toolbox typically creates `idea`/`pycharm` launchers,
- * while package managers may use edition-specific names.
- */
-const LINUX_CLI_CANDIDATES: Partial<Record<ExternalApp, string[]>> = {
-	intellij: ["idea", "intellij-idea-ultimate", "intellij-idea-community"],
-	pycharm: ["pycharm", "pycharm-professional", "pycharm-community"],
-};
-
 /** Map of app IDs to their Windows CLI commands (in PATH when installed) */
 const WINDOWS_CLI_COMMANDS: Record<ExternalApp, string | null> = {
 	finder: null, // Handled specially with shell.showItemInFolder
@@ -84,38 +45,22 @@ const WINDOWS_CLI_CANDIDATES: Partial<Record<ExternalApp, string[]>> = {
  * Returns an array of commands to try in order — for multi-edition apps (IntelliJ, PyCharm),
  * multiple candidates are returned so the caller can fall back if one isn't installed.
  *
- * macOS: Uses `open -b` (bundle ID) for multi-edition apps and `open -a` (app name) for others.
- * Linux: Uses direct CLI commands (e.g. `code`, `cursor`, `zed`).
+ * Windows: Uses direct CLI commands (e.g. `code`, `cursor`, `zed`).
  */
 export function getAppCommand(
 	app: ExternalApp,
 	targetPath: string,
-	platform: NodeJS.Platform = process.platform,
+	_platform: NodeJS.Platform = process.platform,
 ): { command: string; args: string[] }[] | null {
-	// Windows
-	if (platform === "win32") {
-		const winCandidates = WINDOWS_CLI_CANDIDATES[app];
-		if (winCandidates) {
-			return winCandidates.map((cmd) => ({
-				command: cmd,
-				args: [targetPath],
-			}));
-		}
-		const cliCommand = WINDOWS_CLI_COMMANDS[app];
-		if (!cliCommand) return null;
-		return [{ command: cliCommand, args: [targetPath] }];
-	}
-
-	// Linux
-	const linuxCandidates = LINUX_CLI_CANDIDATES[app];
-	if (linuxCandidates) {
-		return linuxCandidates.map((cmd) => ({
+	// Windows CLI commands
+	const winCandidates = WINDOWS_CLI_CANDIDATES[app];
+	if (winCandidates) {
+		return winCandidates.map((cmd) => ({
 			command: cmd,
 			args: [targetPath],
 		}));
 	}
-
-	const cliCommand = LINUX_CLI_COMMANDS[app];
+	const cliCommand = WINDOWS_CLI_COMMANDS[app];
 	if (!cliCommand) return null;
 	return [{ command: cliCommand, args: [targetPath] }];
 }
@@ -295,7 +240,8 @@ export function resolvePath(filePath: string, cwd?: string): string {
 			: nodePath.resolve(resolved);
 	}
 
-	return resolved;
+	// Normalize path separators for Windows
+	return nodePath.normalize(resolved);
 }
 
 /**
