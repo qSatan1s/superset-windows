@@ -15,11 +15,28 @@ import {
 import { outlit } from "./lib/outlit";
 import { persistentHistory } from "./lib/persistent-hash-history";
 import { posthog } from "./lib/posthog";
+import { electronTrpcClient } from "./lib/trpc-client";
 import { electronQueryClient } from "./providers/ElectronTRPCProvider";
 import { routeTree } from "./routeTree.gen";
 
 import "./globals.css";
 import "./styles/bundled-fonts.css";
+
+// Global click handler for external links.
+// Ensures <a> tags with http(s) URLs always open in the system browser,
+// regardless of whether Electron's setWindowOpenHandler fires correctly.
+document.addEventListener("click", (event) => {
+	const anchor = (event.target as HTMLElement).closest("a");
+	if (!anchor) return;
+
+	const href = anchor.getAttribute("href");
+	if (!href?.startsWith("http://") && !href?.startsWith("https://")) return;
+
+	event.preventDefault();
+	electronTrpcClient.external.openUrl.mutate(href).catch((err) => {
+		console.error("[global-link] Failed to open URL:", href, err);
+	});
+});
 
 const rootElement = document.querySelector("app");
 initBootErrorHandling(rootElement);
