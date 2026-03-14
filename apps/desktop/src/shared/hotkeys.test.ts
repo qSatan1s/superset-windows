@@ -5,6 +5,7 @@ import {
 	deriveNonMacDefault,
 	hotkeyFromKeyboardEvent,
 	isTerminalReservedEvent,
+	matchesHotkeyEvent,
 	toElectronAccelerator,
 } from "./hotkeys";
 
@@ -50,6 +51,56 @@ describe("deriveNonMacDefault", () => {
 	});
 });
 
+describe("matchesHotkeyEvent", () => {
+	it("matches ctrl+c with Latin layout", () => {
+		expect(
+			matchesHotkeyEvent(
+				{
+					key: "c",
+					code: "KeyC",
+					ctrlKey: true,
+					shiftKey: false,
+					altKey: false,
+					metaKey: false,
+				},
+				"ctrl+c",
+			),
+		).toBe(true);
+	});
+
+	it("matches ctrl+c with Cyrillic layout (event.key = 'с')", () => {
+		expect(
+			matchesHotkeyEvent(
+				{
+					key: "с", // Cyrillic 'с'
+					code: "KeyC",
+					ctrlKey: true,
+					shiftKey: false,
+					altKey: false,
+					metaKey: false,
+				},
+				"ctrl+c",
+			),
+		).toBe(true);
+	});
+
+	it("matches ctrl+shift+k with Cyrillic layout", () => {
+		expect(
+			matchesHotkeyEvent(
+				{
+					key: "л", // Cyrillic 'л' on KeyK
+					code: "KeyK",
+					ctrlKey: true,
+					shiftKey: true,
+					altKey: false,
+					metaKey: false,
+				},
+				"ctrl+shift+k",
+			),
+		).toBe(true);
+	});
+});
+
 describe("hotkeyFromKeyboardEvent", () => {
 	it("captures a simple event on windows", () => {
 		const keys = hotkeyFromKeyboardEvent(
@@ -64,6 +115,21 @@ describe("hotkeyFromKeyboardEvent", () => {
 			"win32",
 		);
 		expect(keys).toBe("ctrl+k");
+	});
+
+	it("captures Cyrillic key as Latin equivalent on windows", () => {
+		const keys = hotkeyFromKeyboardEvent(
+			{
+				key: "с", // Cyrillic 'с'
+				code: "KeyC",
+				metaKey: false,
+				ctrlKey: true,
+				altKey: false,
+				shiftKey: false,
+			},
+			"win32",
+		);
+		expect(keys).toBe("ctrl+c");
 	});
 });
 

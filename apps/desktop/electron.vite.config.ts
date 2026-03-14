@@ -124,6 +124,9 @@ export default defineConfig({
 				// non-existent `lib/xterm.mjs`. Force Vite to use the CJS entry instead.
 				"@xterm/headless": "@xterm/headless/lib-headless/xterm-headless.js",
 			},
+			// Ensure deps of bundled workspace packages resolve from desktop's node_modules
+			// (e.g., @trpc/client used by @superset/host-service)
+			dedupe: ["@trpc/client", "@trpc/server", "superjson"],
 		},
 	},
 

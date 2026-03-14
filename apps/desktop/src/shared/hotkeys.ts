@@ -149,6 +149,18 @@ function normalizeKey(raw: string): string {
 	return KEY_ALIAS_MAP[lower] ?? lower;
 }
 
+/** Map physical event.code to logical key, for layout-independent matching (e.g., Cyrillic) */
+function keyFromEventCode(code: string): string | null {
+	// code is already lowercased via normalizeKey
+	if (code.startsWith("key") && code.length === 4) {
+		return code[3]; // "keya" -> "a"
+	}
+	if (code.startsWith("digit") && code.length === 6) {
+		return code[5]; // "digit1" -> "1"
+	}
+	return null;
+}
+
 function parseHotkeyString(keys: string): {
 	modifiers: Set<string>;
 	key: string | null;
@@ -265,7 +277,11 @@ export function matchesHotkeyEvent(
 	// Use event.code to match digit keys when alt is pressed
 	if (/^[1-9]$/.test(key) && eventCode === `digit${key}`) return true;
 
-	return eventKey === key;
+	if (eventKey === key) return true;
+
+	// Fallback: use physical key code for non-Latin keyboard layouts (e.g., Cyrillic)
+	const physicalKey = keyFromEventCode(eventCode);
+	return physicalKey !== null && physicalKey === key;
 }
 
 export function hotkeyFromKeyboardEvent(
@@ -291,7 +307,14 @@ export function hotkeyFromKeyboardEvent(
 		return null;
 	}
 
-	const primary = normalizedKey;
+	// Resolve physical key for non-Latin layouts (e.g., pressing Ctrl+С on Russian layout → "ctrl+c")
+	let primary = normalizedKey;
+	if (event.code) {
+		const physicalKey = keyFromEventCode(normalizeKey(event.code));
+		if (physicalKey && !/^[a-z0-9]$/.test(normalizedKey)) {
+			primary = physicalKey;
+		}
+	}
 
 	const modifiers = new Set<string>();
 	if (event.metaKey) modifiers.add("meta");
