@@ -28,7 +28,7 @@ import {
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useI18n } from "renderer/lib/i18n";
 import { resolveEffectiveWorkspaceBaseBranch } from "renderer/lib/workspaceBaseBranch";
-import { useCreateWorkspace } from "renderer/react-query/workspaces";
+import { useHotkeysStore } from "renderer/stores/hotkeys/store";
 import {
 	resolveBranchPrefix,
 	sanitizeBranchNameWithMaxLength,
@@ -50,7 +50,7 @@ export function PromptGroup({ projectId }: PromptGroupProps) {
 	const isDark = useIsDarkTheme();
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const { tt } = useI18n();
-	const { closeModal, draft, runAsyncAction, updateDraft } =
+	const { closeModal, createWorkspace, draft, runAsyncAction, updateDraft } =
 		useNewWorkspaceModalDraft();
 	const [baseBranchOpen, setBaseBranchOpen] = useState(false);
 	const {
@@ -64,10 +64,6 @@ export function PromptGroup({ projectId }: PromptGroupProps) {
 	} = draft;
 	const runSetupScriptRef = useRef(runSetupScript);
 	runSetupScriptRef.current = runSetupScript;
-	const createWorkspace = useCreateWorkspace({
-		resolveInitialCommands: (commands) =>
-			runSetupScriptRef.current ? commands : null,
-	});
 	const [selectedAgent, setSelectedAgent] = useState<WorkspaceCreateAgent>(
 		() => {
 			if (typeof window === "undefined") return "none";
@@ -222,7 +218,11 @@ export function PromptGroup({ projectId }: PromptGroupProps) {
 					baseBranch: baseBranch || undefined,
 					applyPrefix,
 				},
-				launchRequest ? { agentLaunchRequest: launchRequest } : undefined,
+				{
+					agentLaunchRequest: launchRequest ?? undefined,
+					resolveInitialCommands: (commands) =>
+						runSetupScriptRef.current ? commands : null,
+				},
 			),
 			{
 				loading: tt("Creating workspace..."),

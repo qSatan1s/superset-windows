@@ -30,6 +30,10 @@ type GitStatusResult = Awaited<
 	ReturnType<HostServiceClient["git"]["status"]["query"]>
 >;
 
+type CloudWhoamiResult = Awaited<
+	ReturnType<HostServiceClient["cloud"]["whoami"]["query"]>
+>;
+
 export function HostServiceStatus() {
 	const enabled = useFeatureFlagEnabled(FEATURE_FLAGS.V2_CLOUD);
 	const { services } = useHostService();
@@ -48,6 +52,22 @@ export function HostServiceStatus() {
 	const [gitStatus, setGitStatus] = useState<GitStatusResult | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [cloudUser, setCloudUser] = useState<CloudWhoamiResult | null>(null);
+	const [cloudLoading, setCloudLoading] = useState(false);
+	const [cloudError, setCloudError] = useState<string | null>(null);
+
+	const [ghLoading, setGhLoading] = useState(false);
+	const [ghResult, setGhResult] = useState<string | null>(null);
+	const [ghError, setGhError] = useState<string | null>(null);
+	const [ghOwner, setGhOwner] = useState("");
+	const [ghRepo, setGhRepo] = useState("");
+
+	const [v2ProjectId, setV2ProjectId] = useState("");
+	const [v2WorkspaceId, setV2WorkspaceId] = useState("");
+	const [v2Branch, setV2Branch] = useState("main");
+	const [v2Loading, setV2Loading] = useState(false);
+	const [v2Result, setV2Result] = useState<string | null>(null);
+	const [v2Error, setV2Error] = useState<string | null>(null);
 
 	const checkHealth = useCallback(async () => {
 		if (!service) {
@@ -97,6 +117,21 @@ export function HostServiceStatus() {
 			setLoading(false);
 		}
 	}, [service, repoPath]);
+
+	const fetchCloudWhoami = useCallback(async () => {
+		if (!service) return;
+		setCloudLoading(true);
+		setCloudError(null);
+		setCloudUser(null);
+		try {
+			const data = await service.client.cloud.whoami.query();
+			setCloudUser(data);
+		} catch (err) {
+			setCloudError(err instanceof Error ? err.message : "Query failed");
+		} finally {
+			setCloudLoading(false);
+		}
+	}, [service]);
 
 	if (!enabled) return null;
 
@@ -151,6 +186,286 @@ export function HostServiceStatus() {
 								<span>Node {info.nodeVersion}</span>
 								<span>Uptime: {Math.floor(info.uptime)}s</span>
 							</>
+						)}
+					</div>
+
+					{/* Cloud API */}
+					<div className="space-y-3">
+						<div className="flex items-center gap-2">
+							<span className="text-sm font-medium">Cloud API</span>
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={cloudLoading || !service}
+								onClick={fetchCloudWhoami}
+							>
+								Whoami
+							</Button>
+						</div>
+
+						{cloudError && (
+							<div className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+								{cloudError}
+							</div>
+						)}
+
+						{cloudLoading && (
+							<div className="text-sm text-muted-foreground">Loading...</div>
+						)}
+
+						{cloudUser && (
+							<div className="rounded-md border border-border p-3 text-sm space-y-1">
+								<div>
+									<span className="text-muted-foreground">Name: </span>
+									{cloudUser.name}
+								</div>
+								<div>
+									<span className="text-muted-foreground">Email: </span>
+									{cloudUser.email}
+								</div>
+								<div>
+									<span className="text-muted-foreground">ID: </span>
+									<span className="font-mono text-xs">{cloudUser.id}</span>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* GitHub API */}
+					<div className="space-y-3 border-b border-border pb-3">
+						<span className="text-sm font-medium">GitHub API</span>
+						<div className="flex gap-2">
+							<input
+								type="text"
+								value={ghOwner}
+								onChange={(e) => setGhOwner(e.target.value)}
+								placeholder="Owner"
+								className="w-40 rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+							/>
+							<input
+								type="text"
+								value={ghRepo}
+								onChange={(e) => setGhRepo(e.target.value)}
+								placeholder="Repo"
+								className="flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+							/>
+						</div>
+						<div className="flex gap-2 flex-wrap">
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={ghLoading || !service}
+								onClick={async () => {
+									setGhLoading(true);
+									setGhError(null);
+									setGhResult(null);
+									try {
+										const data = await service?.client.github.getUser.query();
+										setGhResult(JSON.stringify(data, null, 2));
+									} catch (err) {
+										setGhError(err instanceof Error ? err.message : "Failed");
+									} finally {
+										setGhLoading(false);
+									}
+								}}
+							>
+								GitHub User
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={ghLoading || !service || !ghOwner || !ghRepo}
+								onClick={async () => {
+									setGhLoading(true);
+									setGhError(null);
+									setGhResult(null);
+									try {
+										const data = await service?.client.github.getRepo.query({
+											owner: ghOwner,
+											repo: ghRepo,
+										});
+										setGhResult(JSON.stringify(data, null, 2));
+									} catch (err) {
+										setGhError(err instanceof Error ? err.message : "Failed");
+									} finally {
+										setGhLoading(false);
+									}
+								}}
+							>
+								Get Repo
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={ghLoading || !service || !ghOwner || !ghRepo}
+								onClick={async () => {
+									setGhLoading(true);
+									setGhError(null);
+									setGhResult(null);
+									try {
+										const data = await service?.client.github.listPRs.query({
+											owner: ghOwner,
+											repo: ghRepo,
+											state: "open",
+											perPage: 5,
+										});
+										setGhResult(JSON.stringify(data, null, 2));
+									} catch (err) {
+										setGhError(err instanceof Error ? err.message : "Failed");
+									} finally {
+										setGhLoading(false);
+									}
+								}}
+							>
+								List PRs
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={ghLoading || !service || !ghOwner || !ghRepo}
+								onClick={async () => {
+									setGhLoading(true);
+									setGhError(null);
+									setGhResult(null);
+									try {
+										const data =
+											await service?.client.github.listDeployments.query({
+												owner: ghOwner,
+												repo: ghRepo,
+											});
+										setGhResult(JSON.stringify(data, null, 2));
+									} catch (err) {
+										setGhError(err instanceof Error ? err.message : "Failed");
+									} finally {
+										setGhLoading(false);
+									}
+								}}
+							>
+								Deployments
+							</Button>
+						</div>
+						{ghLoading && (
+							<div className="text-sm text-muted-foreground">Loading...</div>
+						)}
+						{ghError && (
+							<div className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+								{ghError}
+							</div>
+						)}
+						{ghResult && (
+							<ScrollArea className="max-h-48">
+								<pre className="text-xs font-mono bg-muted rounded-md p-2">
+									{ghResult}
+								</pre>
+							</ScrollArea>
+						)}
+					</div>
+
+					<div className="space-y-3 border-b border-border pb-3">
+						<span className="text-sm font-medium">V2 Operations</span>
+						<div className="flex gap-2">
+							<input
+								type="text"
+								value={v2ProjectId}
+								onChange={(e) => setV2ProjectId(e.target.value)}
+								placeholder="Project ID"
+								className="flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+							/>
+							<input
+								type="text"
+								value={v2Branch}
+								onChange={(e) => setV2Branch(e.target.value)}
+								placeholder="Branch"
+								className="w-32 rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+							/>
+						</div>
+						<div className="flex gap-2">
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={v2Loading || !service || !v2ProjectId}
+								onClick={async () => {
+									setV2Loading(true);
+									setV2Error(null);
+									setV2Result(null);
+									try {
+										const result =
+											await service?.client.workspace.create.mutate({
+												projectId: v2ProjectId,
+												name: `workspace-${v2Branch}`,
+												branch: v2Branch,
+											});
+										setV2WorkspaceId(result?.id ?? "");
+										setV2Result(JSON.stringify(result, null, 2));
+									} catch (err) {
+										setV2Error(err instanceof Error ? err.message : "Failed");
+									} finally {
+										setV2Loading(false);
+									}
+								}}
+							>
+								Create Workspace
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={v2Loading || !service || !v2WorkspaceId}
+								onClick={async () => {
+									setV2Loading(true);
+									setV2Error(null);
+									setV2Result(null);
+									try {
+										const result =
+											await service?.client.workspace.delete.mutate({
+												id: v2WorkspaceId,
+											});
+										setV2Result(JSON.stringify(result, null, 2));
+										setV2WorkspaceId("");
+									} catch (err) {
+										setV2Error(err instanceof Error ? err.message : "Failed");
+									} finally {
+										setV2Loading(false);
+									}
+								}}
+							>
+								Delete Workspace
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
+								disabled={v2Loading || !service || !v2ProjectId}
+								onClick={async () => {
+									setV2Loading(true);
+									setV2Error(null);
+									setV2Result(null);
+									try {
+										const result =
+											await service?.client.project.removeFromDevice.mutate({
+												projectId: v2ProjectId,
+											});
+										setV2Result(JSON.stringify(result, null, 2));
+									} catch (err) {
+										setV2Error(err instanceof Error ? err.message : "Failed");
+									} finally {
+										setV2Loading(false);
+									}
+								}}
+							>
+								Remove Project from Device
+							</Button>
+						</div>
+						{v2Loading && (
+							<div className="text-sm text-muted-foreground">Loading...</div>
+						)}
+						{v2Error && (
+							<div className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+								{v2Error}
+							</div>
+						)}
+						{v2Result && (
+							<pre className="text-xs font-mono bg-muted rounded-md p-2 overflow-auto max-h-40">
+								{v2Result}
+							</pre>
 						)}
 					</div>
 

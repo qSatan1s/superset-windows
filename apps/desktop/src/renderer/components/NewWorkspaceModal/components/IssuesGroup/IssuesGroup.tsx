@@ -5,7 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { eq, isNull } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GoArrowUpRight } from "react-icons/go";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import { SiLinear } from "react-icons/si";
@@ -14,7 +14,6 @@ import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useI18n } from "renderer/lib/i18n";
 import { getSlugColumnWidth } from "renderer/lib/slug-width";
-import { useCreateWorkspace } from "renderer/react-query/workspaces";
 import {
 	StatusIcon,
 	type StatusType,
@@ -25,6 +24,8 @@ import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/u
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useNewWorkspaceModalDraft } from "../../NewWorkspaceModalDraftContext";
 
+const PAGE_SIZE = 50;
+
 interface IssuesGroupProps {
 	projectId: string | null;
 }
@@ -34,8 +35,7 @@ export function IssuesGroup({ projectId }: IssuesGroupProps) {
 	const navigate = useNavigate();
 	const { gateFeature } = usePaywall();
 	const { tt } = useI18n();
-	const createWorkspace = useCreateWorkspace();
-	const { draft, closeAndResetDraft, runAsyncAction } =
+	const { createWorkspace, draft, closeAndResetDraft, runAsyncAction } =
 		useNewWorkspaceModalDraft();
 
 	const { data: integrations } = useLiveQuery(
@@ -89,18 +89,47 @@ export function IssuesGroup({ projectId }: IssuesGroupProps) {
 	const tasks = useMemo(() => data ?? [], [data]);
 	const sortedTasks = useMemo(() => [...tasks].sort(compareTasks), [tasks]);
 
+	const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 	const debouncedQuery = useDebouncedValue(draft.issuesQuery, 150);
 	const { search } = useHybridSearch(sortedTasks);
 
-	const visibleTasks = useMemo(() => {
+	// Reset pagination when search query changes
+	const [prevQuery, setPrevQuery] = useState(debouncedQuery);
+	if (prevQuery !== debouncedQuery) {
+		setPrevQuery(debouncedQuery);
+		setDisplayLimit(PAGE_SIZE);
+	}
+
+	const allMatchingTasks = useMemo(() => {
 		const query = debouncedQuery.trim();
 		if (!query) {
-			return sortedTasks.slice(0, 100);
+			return sortedTasks;
 		}
-		return search(query)
-			.slice(0, 100)
-			.map((result) => result.item);
+		return search(query).map((result) => result.item);
 	}, [debouncedQuery, sortedTasks, search]);
+
+	const visibleTasks = useMemo(
+		() => allMatchingTasks.slice(0, displayLimit),
+		[allMatchingTasks, displayLimit],
+	);
+	const hasMore = allMatchingTasks.length > displayLimit;
+
+	// Infinite scroll: load more when sentinel is visible
+	const sentinelRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		const el = sentinelRef.current;
+		if (!el || !hasMore) return;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0]?.isIntersecting) {
+					setDisplayLimit((prev) => prev + PAGE_SIZE);
+				}
+			},
+			{ threshold: 0 },
+		);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [hasMore]);
 
 	const slugWidth = useMemo(
 		() => getSlugColumnWidth(visibleTasks.map((task) => task.slug)),
@@ -206,6 +235,12 @@ export function IssuesGroup({ projectId }: IssuesGroupProps) {
 					</span>
 				</CommandItem>
 			))}
+			{hasMore && (
+				<div
+					ref={sentinelRef}
+					className="flex items-center justify-center py-2 text-xs text-muted-foreground"
+				/>
+			)}
 		</CommandGroup>
 	);
 }

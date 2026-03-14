@@ -3,55 +3,114 @@ import { CommandEmpty, CommandGroup, CommandItem } from "@superset/ui/command";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
-import Fuse from "fuse.js";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GoArrowUpRight, GoGitBranch, GoGlobe } from "react-icons/go";
-import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useI18n } from "renderer/lib/i18n";
-import {
-	useCreateBranchWorkspace,
-	useHandleOpenedWorktree,
-	useImportAllWorktrees,
-	useOpenExternalWorktree,
-} from "renderer/react-query/workspaces";
+import { useImportAllWorktrees } from "renderer/react-query/workspaces";
 import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useNewWorkspaceModalDraft } from "../../NewWorkspaceModalDraftContext";
+import { buildCreateWorkspaceFromBranchInput } from "./buildCreateWorkspaceFromBranchInput";
 import { resolveBranchAction } from "./resolveBranchAction";
 
 interface BranchesGroupProps {
 	projectId: string | null;
 }
 
+const PAGE_SIZE = 50;
+const BRANCH_SEARCH_LIMIT = 5000;
+
 type BranchFilterMode = "all" | "worktrees";
 
+/** Displays a searchable, infinitely-scrollable list of git branches for creating or opening workspaces. */
 export function BranchesGroup({ projectId }: BranchesGroupProps) {
 	const modKey = "Ctrl";
 	const navigate = useNavigate();
 	const { tt } = useI18n();
-	const createBranchWorkspace = useCreateBranchWorkspace();
-	const handleOpenedWorktree = useHandleOpenedWorktree();
 	const importAllWorktrees = useImportAllWorktrees();
-	const openExternalWorktree = useOpenExternalWorktree();
-	const { draft, closeAndResetDraft, runAsyncAction } =
-		useNewWorkspaceModalDraft();
+	const {
+		createWorkspace,
+		openTrackedWorktree,
+		openExternalWorktree,
+		draft,
+		closeAndResetDraft,
+		runAsyncAction,
+	} = useNewWorkspaceModalDraft();
 	const [filterMode, setFilterMode] = useState<BranchFilterMode>("all");
+	const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
-	// Fast query: local branches + cached remote refs (no network)
-	const { data: localData, isLoading: isLocalLoading } =
+	// Reset pagination when search query changes
+	const [prevQuery, setPrevQuery] = useState(draft.branchesQuery);
+	if (prevQuery !== draft.branchesQuery) {
+		setPrevQuery(draft.branchesQuery);
+		setDisplayLimit(PAGE_SIZE);
+	}
+
+	const {
+		data: searchData,
+		isLoading: isSearchLoading,
+		isError: isSearchError,
+	} = electronTrpc.projects.searchBranches.useQuery(
+		{
+			projectId: projectId ?? "",
+			search: "",
+			limit: BRANCH_SEARCH_LIMIT,
+			offset: 0,
+		},
+		{
+			enabled: !!projectId && filterMode === "all",
+			placeholderData: (previous) => previous,
+			retry: false,
+		},
+	);
+
+	// Fallback: use getBranchesLocal when searchBranches fails
+	const { data: localBranchData, isLoading: isLocalLoading } =
 		electronTrpc.projects.getBranchesLocal.useQuery(
 			{ projectId: projectId ?? "" },
-			{ enabled: !!projectId },
+			{ enabled: !!projectId && isSearchError },
 		);
 
-	// Slow query: fetches from remote, runs in background
-	const { data: remoteData } = electronTrpc.projects.getBranches.useQuery(
+	// Background: fetch from remote to refresh local refs, then invalidate search cache
+	const utils = electronTrpc.useUtils();
+	const { data: remoteBranchData } = electronTrpc.projects.getBranches.useQuery(
 		{ projectId: projectId ?? "" },
 		{ enabled: !!projectId },
 	);
+	const prevRemoteDataRef = useRef(remoteBranchData);
+	useEffect(() => {
+		if (remoteBranchData && remoteBranchData !== prevRemoteDataRef.current) {
+			prevRemoteDataRef.current = remoteBranchData;
+			void utils.projects.searchBranches.invalidate();
+		}
+	}, [remoteBranchData, utils]);
 
-	// Use remote data when available, fall back to local data
-	const data = remoteData ?? localData;
+	// Combine: prefer searchBranches, fall back to getBranchesLocal; always filter client-side
+	const allBranchData = useMemo(() => {
+		const source = searchData && !isSearchError ? searchData : localBranchData;
+		if (!source) return undefined;
+		const query = draft.branchesQuery.trim().toLowerCase();
+		const filtered = query
+			? source.branches.filter((b) => b.name.toLowerCase().includes(query))
+			: source.branches;
+		return {
+			branches: filtered,
+			defaultBranch: source.defaultBranch,
+			totalCount: filtered.length,
+		};
+	}, [searchData, isSearchError, localBranchData, draft.branchesQuery]);
+
+	const effectiveData = useMemo(
+		() =>
+			allBranchData
+				? {
+						...allBranchData,
+						branches: allBranchData.branches.slice(0, displayLimit),
+						hasMore: allBranchData.branches.length > displayLimit,
+					}
+				: undefined,
+		[allBranchData, displayLimit],
+	);
 
 	const { data: allWorkspaces = [] } =
 		electronTrpc.workspaces.getAll.useQuery();
@@ -101,116 +160,94 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 		return map;
 	}, [externalWorktrees]);
 
-	const defaultBranch = data?.defaultBranch ?? "main";
+	// For "all" mode, use server-side searched data
+	const serverBranchRows = useMemo(() => {
+		if (!effectiveData) return [];
+		return effectiveData.branches.map((branch) => {
+			const action = resolveBranchAction({
+				branchName: branch.name,
+				workspaceByBranch,
+				trackedWorktreeByBranch,
+				externalWorktreeByBranch,
+			});
+			return { branch, action };
+		});
+	}, [
+		effectiveData,
+		workspaceByBranch,
+		trackedWorktreeByBranch,
+		externalWorktreeByBranch,
+	]);
 
-	const branches = (data?.branches ?? []).sort((a, b) => {
-		if (a.name === defaultBranch) return -1;
-		if (b.name === defaultBranch) return 1;
-		if (a.isLocal !== b.isLocal) return a.isLocal ? -1 : 1;
-		return a.name.localeCompare(b.name);
-	});
-
-	const branchByName = useMemo(
-		() => new Map(branches.map((branch) => [branch.name, branch])),
-		[branches],
-	);
-
-	const branchRows = useMemo(
-		() =>
-			branches.map((branch) => ({
-				branch,
-				action: resolveBranchAction({
-					branchName: branch.name,
+	// For "worktrees" mode, keep client-side (small dataset).
+	// Uses allBranchData (unpaginated) so metadata is available for all worktree branches.
+	const worktreeBranchRows = useMemo(() => {
+		const query = draft.branchesQuery.trim().toLowerCase();
+		return externalWorktrees
+			.filter((wt) => !query || wt.branch.toLowerCase().includes(query))
+			.map((worktree) => {
+				const branch = allBranchData?.branches.find(
+					(b) => b.name === worktree.branch,
+				) ?? {
+					name: worktree.branch,
+					lastCommitDate: 0,
+					isLocal: true,
+					isRemote: false,
+				};
+				const action = resolveBranchAction({
+					branchName: worktree.branch,
 					workspaceByBranch,
 					trackedWorktreeByBranch,
 					externalWorktreeByBranch,
-				}),
-				isWorktreeBranch: externalWorktreeByBranch.has(branch.name),
-			})),
-		[
-			branches,
-			externalWorktreeByBranch,
-			trackedWorktreeByBranch,
-			workspaceByBranch,
-		],
-	);
+				});
+				return { branch, action };
+			})
+			.sort((a, b) => {
+				const defaultBranch = allBranchData?.defaultBranch ?? "main";
+				if (a.branch.name === defaultBranch) return -1;
+				if (b.branch.name === defaultBranch) return 1;
+				if (a.branch.isLocal !== b.branch.isLocal) {
+					return a.branch.isLocal ? -1 : 1;
+				}
+				return a.branch.name.localeCompare(b.branch.name);
+			});
+	}, [
+		externalWorktrees,
+		allBranchData,
+		workspaceByBranch,
+		trackedWorktreeByBranch,
+		externalWorktreeByBranch,
+		draft.branchesQuery,
+	]);
 
-	const worktreeBranchRows = useMemo(
-		() =>
-			externalWorktrees
-				.map((worktree) => {
-					const branch = branchByName.get(worktree.branch) ?? {
-						name: worktree.branch,
-						lastCommitDate: 0,
-						isLocal: true,
-						isRemote: false,
-					};
-					return {
-						branch,
-						action: resolveBranchAction({
-							branchName: worktree.branch,
-							workspaceByBranch,
-							trackedWorktreeByBranch,
-							externalWorktreeByBranch,
-						}),
-						isWorktreeBranch: true,
-					};
-				})
-				.sort((a, b) => {
-					if (a.branch.name === defaultBranch) return -1;
-					if (b.branch.name === defaultBranch) return 1;
-					if (a.branch.isLocal !== b.branch.isLocal) {
-						return a.branch.isLocal ? -1 : 1;
-					}
-					return a.branch.name.localeCompare(b.branch.name);
-				}),
-		[
-			branchByName,
-			defaultBranch,
-			externalWorktreeByBranch,
-			externalWorktrees,
-			trackedWorktreeByBranch,
-			workspaceByBranch,
-		],
-	);
+	const visibleBranchRows =
+		filterMode === "worktrees" ? worktreeBranchRows : serverBranchRows;
 
-	const baseBranchRows = useMemo(
-		() => (filterMode === "worktrees" ? worktreeBranchRows : branchRows),
-		[branchRows, filterMode, worktreeBranchRows],
-	);
-
-	const debouncedQuery = useDebouncedValue(draft.branchesQuery, 150);
-
-	const branchFuse = useMemo(
-		() =>
-			new Fuse(baseBranchRows, {
-				keys: ["branch.name"],
-				threshold: 0.3,
-				includeScore: true,
-				ignoreLocation: true,
-			}),
-		[baseBranchRows],
-	);
-
-	const visibleBranchRows = useMemo(() => {
-		const query = debouncedQuery.trim();
-		if (!query) {
-			return baseBranchRows.slice(0, 100);
-		}
-		return branchFuse
-			.search(query)
-			.slice(0, 100)
-			.map((result) => result.item);
-	}, [debouncedQuery, baseBranchRows, branchFuse]);
+	// Infinite scroll: load more when sentinel is visible
+	const sentinelRef = useRef<HTMLDivElement>(null);
+	const hasMore = filterMode === "all" && (effectiveData?.hasMore ?? false);
+	useEffect(() => {
+		const el = sentinelRef.current;
+		if (!el || !hasMore) return;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0]?.isIntersecting) {
+					setDisplayLimit((prev) => prev + PAGE_SIZE);
+				}
+			},
+			{ threshold: 0 },
+		);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [hasMore]);
 
 	const handleCreate = useCallback(
 		(branchName: string) => {
 			if (!projectId) return;
 			void runAsyncAction(
-				createBranchWorkspace.mutateAsync({
-					projectId,
-					branch: branchName,
-				}),
+				createWorkspace.mutateAsync(
+					buildCreateWorkspaceFromBranchInput(projectId, branchName),
+				),
 				{
 					loading: tt("Creating workspace from branch..."),
 					success: tt("Workspace created"),
@@ -221,7 +258,7 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 				},
 			);
 		},
-		[createBranchWorkspace, projectId, runAsyncAction, tt],
+		[createWorkspace, projectId, runAsyncAction, tt],
 	);
 
 	const handleOpen = useCallback(
@@ -231,12 +268,6 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 		},
 		[closeAndResetDraft, navigate],
 	);
-
-	const openTrackedWorktree = electronTrpc.workspaces.openWorktree.useMutation({
-		onSuccess: async (data) => {
-			await handleOpenedWorktree(data);
-		},
-	});
 
 	const handleOpenTrackedWorktree = useCallback(
 		(worktreeId: string, branchName: string) => {
@@ -338,7 +369,11 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 		);
 	}
 
-	if (isLocalLoading) {
+	if (
+		!allBranchData &&
+		(isSearchLoading || (isSearchError && isLocalLoading)) &&
+		filterMode === "all"
+	) {
 		return (
 			<CommandGroup>
 				<CommandEmpty>{tt("Loading branches...")}</CommandEmpty>
@@ -352,7 +387,9 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 				<div className="flex items-center gap-1 rounded-md bg-muted/40 p-0.5">
 					{(["all", "worktrees"] as const).map((value) => {
 						const count =
-							value === "all" ? branchRows.length : worktreeBranchRows.length;
+							value === "all"
+								? (effectiveData?.totalCount ?? 0)
+								: worktreeBranchRows.length;
 						return (
 							<button
 								key={value}
@@ -458,6 +495,12 @@ export function BranchesGroup({ projectId }: BranchesGroupProps) {
 						</CommandItem>
 					);
 				})}
+				{hasMore && (
+					<div
+						ref={sentinelRef}
+						className="flex items-center justify-center py-2 text-xs text-muted-foreground"
+					/>
+				)}
 			</CommandGroup>
 		</>
 	);

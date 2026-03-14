@@ -3,6 +3,8 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import type { ChangeCategory } from "shared/changes-types";
 import { isImageFile } from "shared/file-types";
 
+const BRANCH_QUERY_STALE_TIME_MS = 10_000;
+
 interface UseFileContentParams {
 	worktreePath: string;
 	filePath: string;
@@ -34,6 +36,8 @@ export function useFileContent({
 		{ worktreePath },
 		{
 			enabled: !isRemote && !!worktreePath && diffCategory === "against-base",
+			staleTime: BRANCH_QUERY_STALE_TIME_MS,
+			refetchOnWindowFocus: false,
 		},
 	);
 	const effectiveBaseBranch =
@@ -51,6 +55,9 @@ export function useFileContent({
 					!isImage &&
 					!!filePath &&
 					!!worktreePath,
+				// useWorkspaceFileEvents is the authoritative invalidation source for on-disk changes;
+				// window-focus refetches are redundant and introduce a race with in-flight user edits.
+				refetchOnWindowFocus: false,
 			},
 		);
 

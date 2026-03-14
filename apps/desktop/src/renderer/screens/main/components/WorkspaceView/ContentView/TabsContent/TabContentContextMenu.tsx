@@ -31,6 +31,7 @@ interface TabContentContextMenuProps {
 	onSplitVertical: PaneContextMenuActions["onSplitVertical"];
 	onSplitWithNewChat?: PaneContextMenuActions["onSplitWithNewChat"];
 	onSplitWithNewBrowser?: PaneContextMenuActions["onSplitWithNewBrowser"];
+	onEqualizePaneSplits?: PaneContextMenuActions["onEqualizePaneSplits"];
 	onClosePane: PaneContextMenuActions["onClosePane"];
 	onClearTerminal?: () => void;
 	onScrollToBottom?: () => void;
@@ -50,6 +51,7 @@ export function TabContentContextMenu({
 	onSplitVertical,
 	onSplitWithNewChat,
 	onSplitWithNewBrowser,
+	onEqualizePaneSplits,
 	onClosePane,
 	onClearTerminal,
 	onScrollToBottom,
@@ -154,6 +156,7 @@ export function TabContentContextMenu({
 						onSplitVertical,
 						onSplitWithNewChat,
 						onSplitWithNewBrowser,
+						onEqualizePaneSplits,
 						onClosePane,
 						currentTabId,
 						availableTabs,

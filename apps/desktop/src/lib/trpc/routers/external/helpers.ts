@@ -29,6 +29,7 @@ const WINDOWS_CLI_COMMANDS: Record<ExternalApp, string | null> = {
 	appcode: null, // macOS only
 	fleet: "fleet",
 	rustrover: "rustrover",
+	"android-studio": "studio",
 };
 
 /**

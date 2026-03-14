@@ -1,5 +1,7 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
+import { app } from "electron";
+import { SUPERSET_HOME_DIR } from "./app-environment";
 
 type HostServiceStatus = "starting" | "running" | "crashed";
 
@@ -18,6 +20,16 @@ const BASE_RESTART_DELAY = 1_000;
 class HostServiceManager {
 	private instances = new Map<string, HostServiceProcess>();
 	private scriptPath = path.join(__dirname, "host-service.js");
+	private authToken: string | null = null;
+	private cloudApiUrl: string | null = null;
+
+	setAuthToken(token: string | null): void {
+		this.authToken = token;
+	}
+
+	setCloudApiUrl(url: string | null): void {
+		this.cloudApiUrl = url;
+	}
 
 	async start(organizationId: string): Promise<number> {
 		const existing = this.instances.get(organizationId);
@@ -54,10 +66,26 @@ class HostServiceManager {
 		return this.instances.get(organizationId)?.status ?? null;
 	}
 
-	private async spawn(organizationId: string): Promise<number> {
+	private spawn(organizationId: string): Promise<number> {
+		const env: Record<string, string> = {
+			...(process.env as Record<string, string>),
+			ELECTRON_RUN_AS_NODE: "1",
+			ORGANIZATION_ID: organizationId,
+			HOST_DB_PATH: path.join(SUPERSET_HOME_DIR, "host.db"),
+			HOST_MIGRATIONS_PATH: app.isPackaged
+				? path.join(process.resourcesPath, "resources/host-migrations")
+				: path.join(app.getAppPath(), "../../packages/host-service/drizzle"),
+		};
+		if (this.authToken) {
+			env.AUTH_TOKEN = this.authToken;
+		}
+		if (this.cloudApiUrl) {
+			env.CLOUD_API_URL = this.cloudApiUrl;
+		}
+
 		const child = spawn(process.execPath, [this.scriptPath], {
 			stdio: ["ignore", "pipe", "pipe"],
-			env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
+			env,
 		});
 
 		const instance: HostServiceProcess = {
