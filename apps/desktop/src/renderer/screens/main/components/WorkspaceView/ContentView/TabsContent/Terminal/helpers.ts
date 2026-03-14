@@ -587,7 +587,7 @@ export function setupKeyboardHandler(
 			!event.altKey &&
 			!event.metaKey
 		) {
-			if (event.key === "c") {
+			if (event.key === "c" || event.code === "KeyC") {
 				if (xterm.hasSelection()) {
 					// Copy selected text to clipboard, prevent xterm from sending SIGINT
 					if (event.type === "keydown") {
@@ -597,7 +597,7 @@ export function setupKeyboardHandler(
 				}
 				// No selection: fall through to isTerminalReservedEvent → SIGINT
 			}
-			if (event.key === "v") {
+			if (event.key === "v" || event.code === "KeyV") {
 				// Trigger paste from clipboard via DOM paste event (handled by setupPasteHandler)
 				if (event.type === "keydown") {
 					document.execCommand("paste");
