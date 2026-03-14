@@ -136,6 +136,7 @@ export interface TabsStore extends TabsState {
 	setPaneStatus: (paneId: string, status: PaneStatus) => void;
 	setPaneName: (paneId: string, name: string) => void;
 	setPaneAutoTitle: (paneId: string, title: string) => void;
+	setPaneRestoreCommand: (paneId: string, command: string | undefined) => void;
 	clearWorkspaceAttentionStatus: (workspaceId: string) => void;
 	resetWorkspaceStatus: (workspaceId: string) => void;
 	updatePaneCwd: (

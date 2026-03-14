@@ -442,6 +442,20 @@ export function useTerminalLifecycle({
 
 								pendingInitialStateRef.current = result;
 								maybeApplyInitialState();
+
+								// Re-launch persisted command (e.g. "claude") on app restart.
+								// Wait for shell prompt to appear before writing the command.
+								const paneData = useTabsStore.getState().panes[paneId];
+								if (paneData?.restoreCommand) {
+									setTimeout(() => {
+										if (isUnmounted || xtermRef.current !== xterm) return;
+										if (isExitedRef.current) return;
+										writeRef.current({
+											paneId,
+											data: `${paneData.restoreCommand}\r`,
+										});
+									}, 800);
+								}
 							},
 							onError: (error) => {
 								if (!isAttachActive()) return;

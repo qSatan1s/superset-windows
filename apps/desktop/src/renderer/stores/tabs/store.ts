@@ -1038,6 +1038,19 @@ export const useTabsStore = create<TabsStore>()(
 					});
 				},
 
+				setPaneRestoreCommand: (paneId, command) => {
+					const state = get();
+					const pane = state.panes[paneId];
+					if (!pane || pane.restoreCommand === command) return;
+
+					set({
+						panes: {
+							...state.panes,
+							[paneId]: { ...pane, restoreCommand: command },
+						},
+					});
+				},
+
 				clearWorkspaceAttentionStatus: (workspaceId) => {
 					const state = get();
 					const workspaceTabs = state.tabs.filter(

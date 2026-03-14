@@ -1,3 +1,5 @@
+import { useTabsStore } from "renderer/stores/tabs/store";
+
 interface TerminalCreateOrAttachInput {
 	paneId: string;
 	tabId: string;
@@ -110,4 +112,9 @@ export async function launchCommandInPane({
 	});
 
 	await writeCommandInPane({ paneId, command, write, noExecute });
+
+	// Persist the command so the pane can re-launch it on app restart
+	if (!noExecute) {
+		useTabsStore.getState().setPaneRestoreCommand(paneId, command);
+	}
 }
