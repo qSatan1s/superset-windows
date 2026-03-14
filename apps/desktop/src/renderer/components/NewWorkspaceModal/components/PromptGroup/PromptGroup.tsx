@@ -28,7 +28,7 @@ import {
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useI18n } from "renderer/lib/i18n";
 import { resolveEffectiveWorkspaceBaseBranch } from "renderer/lib/workspaceBaseBranch";
-import { useHotkeysStore } from "renderer/stores/hotkeys/store";
+
 import {
 	resolveBranchPrefix,
 	sanitizeBranchNameWithMaxLength,

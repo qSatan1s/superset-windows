@@ -522,6 +522,23 @@ export function useTerminalLifecycle({
 		const cleanupFocus = setupFocusListener(xterm, () =>
 			handleTerminalFocusRef.current(),
 		);
+
+		// Re-focus xterm after mouse wheel scrolling ends so the user can
+		// immediately type without clicking.  We wait briefly after the last
+		// wheel event to avoid stealing focus while the user is still
+		// scrolling or selecting text.
+		let scrollEndTimer: ReturnType<typeof setTimeout> | null = null;
+		const handleWheel = () => {
+			if (scrollEndTimer) clearTimeout(scrollEndTimer);
+			scrollEndTimer = setTimeout(() => {
+				scrollEndTimer = null;
+				if (!isUnmounted && isFocusedRef.current && !xterm.hasSelection()) {
+					xterm.focus();
+				}
+			}, 150);
+		};
+		container.addEventListener("wheel", handleWheel, { passive: true });
+
 		const cleanupResize = setupResizeHandlers(
 			container,
 			xterm,
@@ -648,6 +665,8 @@ export function useTerminalLifecycle({
 			clearAttachInFlight(paneId, cleanupAttachId);
 			if (firstRenderFallback) clearTimeout(firstRenderFallback);
 			cancelReattachRecovery();
+			container.removeEventListener("wheel", handleWheel);
+			if (scrollEndTimer) clearTimeout(scrollEndTimer);
 			document.removeEventListener("visibilitychange", handleVisibilityChange);
 			window.removeEventListener("focus", handleWindowFocus);
 			inputDisposable.dispose();

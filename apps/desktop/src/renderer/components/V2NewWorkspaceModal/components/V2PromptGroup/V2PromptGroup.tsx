@@ -6,7 +6,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { resolveEffectiveWorkspaceBaseBranch } from "renderer/lib/workspaceBaseBranch";
-import { useHotkeysStore } from "renderer/stores/hotkeys/store";
+
 import {
 	resolveBranchPrefix,
 	sanitizeBranchNameWithMaxLength,
@@ -27,8 +27,7 @@ export function V2PromptGroup({
 	selectedDeviceId,
 }: V2PromptGroupProps) {
 	const navigate = useNavigate();
-	const platform = useHotkeysStore((state) => state.platform);
-	const modKey = platform === "darwin" ? "⌘" : "Ctrl";
+	const modKey = "Ctrl";
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const { closeModal, draft, runAsyncAction, updateDraft } =
 		useV2NewWorkspaceModalDraft();

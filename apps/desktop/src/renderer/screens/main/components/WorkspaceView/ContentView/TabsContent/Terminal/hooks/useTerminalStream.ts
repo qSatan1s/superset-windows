@@ -148,7 +148,23 @@ export function useTerminalStream({
 				}
 
 				updateModesRef.current(event.data);
-				xterm.write(event.data);
+
+				// Preserve scroll position when user is scrolled up.
+				// xterm.write() auto-scrolls to bottom; when the user is reading
+				// earlier output we save their viewport offset and restore it
+				// after the write completes so the view doesn't jump.
+				const buffer = xterm.buffer.active;
+				const isAtBottom = buffer.viewportY >= buffer.baseY;
+
+				if (isAtBottom) {
+					xterm.write(event.data);
+				} else {
+					const savedViewportY = buffer.viewportY;
+					xterm.write(event.data, () => {
+						xterm.scrollToLine(savedViewportY);
+					});
+				}
+
 				updateCwdRef.current(event.data);
 			} else if (event.type === "exit") {
 				handleTerminalExit(event.exitCode, xterm, event.reason);

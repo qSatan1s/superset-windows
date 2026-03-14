@@ -14,7 +14,7 @@ import {
 	HiOutlineUser,
 } from "react-icons/hi2";
 import { LuBrain, LuGitBranch, LuKeyboard } from "react-icons/lu";
-import { electronTrpc } from "renderer/lib/electron-trpc";
+
 import { useI18n } from "renderer/lib/i18n";
 import type { SettingsSection } from "renderer/stores/settings-state";
 

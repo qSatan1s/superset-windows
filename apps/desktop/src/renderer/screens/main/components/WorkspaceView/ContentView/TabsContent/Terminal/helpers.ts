@@ -580,7 +580,13 @@ export function setupKeyboardHandler(
 		// Windows clipboard: Ctrl+C copies if text is selected (otherwise SIGINT),
 		// Ctrl+V pastes from clipboard. On macOS, Cmd+C/V don't conflict with
 		// Ctrl+C (SIGINT), but on Windows both use Ctrl so we need special handling.
-		if (isWindows && event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
+		if (
+			isWindows &&
+			event.ctrlKey &&
+			!event.shiftKey &&
+			!event.altKey &&
+			!event.metaKey
+		) {
 			if (event.key === "c") {
 				if (xterm.hasSelection()) {
 					// Copy selected text to clipboard, prevent xterm from sending SIGINT
