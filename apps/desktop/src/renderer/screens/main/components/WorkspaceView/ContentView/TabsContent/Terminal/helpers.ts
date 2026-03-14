@@ -577,6 +577,29 @@ export function setupKeyboardHandler(
 			return false;
 		}
 
+		// Windows clipboard: Ctrl+C copies if text is selected (otherwise SIGINT),
+		// Ctrl+V pastes from clipboard. On macOS, Cmd+C/V don't conflict with
+		// Ctrl+C (SIGINT), but on Windows both use Ctrl so we need special handling.
+		if (isWindows && event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
+			if (event.key === "c") {
+				if (xterm.hasSelection()) {
+					// Copy selected text to clipboard, prevent xterm from sending SIGINT
+					if (event.type === "keydown") {
+						document.execCommand("copy");
+					}
+					return false;
+				}
+				// No selection: fall through to isTerminalReservedEvent → SIGINT
+			}
+			if (event.key === "v") {
+				// Trigger paste from clipboard via DOM paste event (handled by setupPasteHandler)
+				if (event.type === "keydown") {
+					document.execCommand("paste");
+				}
+				return false;
+			}
+		}
+
 		if (isTerminalReservedEvent(event)) return true;
 
 		const clearKeys = getHotkeyKeys("CLEAR_TERMINAL");
